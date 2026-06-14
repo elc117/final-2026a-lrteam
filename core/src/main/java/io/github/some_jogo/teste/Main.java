@@ -29,6 +29,9 @@ public class Main implements ApplicationListener {
     Texture florestaTexture;
     Texture rioTexture;
     Texture personagemTexture;
+    Texture arvoreTexture;
+    Texture baldeVazioTexture;
+    Texture baldeCheioTexture;
     Animation<TextureRegion> walkAnimation;
     TextureRegion idleFrame;
 
@@ -52,19 +55,24 @@ public class Main implements ApplicationListener {
 
     int mapaAtual = 1;
 
-    float arvoreX = 2f;
-    float arvoreY = 3f;
+    float arvoreX = 4.5f;
+    float arvoreY = 4f;
 
-    float rioX = 4f;
-    float rioY = 2f;
+    float rioX = 6.0f;
+    float rioY = 1f;
 
-    float distanciaInteracao = 1.5f; //coleta itens se estiver a 1.5 de distancia
+    float distanciaInteracao = 0.5f; //coleta itens se estiver a 0.5 de distancia
+
+    boolean baldeCheio = false;
 
     @Override
     public void create() {
         florestaTexture = new Texture("grama.png");
         rioTexture = new Texture("rio.png");
         personagemTexture = new Texture("personagem.png");
+        arvoreTexture = new Texture("arvore.png");
+        baldeVazioTexture = new Texture("baldeVazio.png");
+        baldeCheioTexture = new Texture("baldeCheio.png");
         // Prepare your application here.
 
         spriteBatch = new SpriteBatch();
@@ -219,9 +227,12 @@ public class Main implements ApplicationListener {
             if (distancia(x, y, rioX, rioY) <= distanciaInteracao) {
                 int agua = rio.coletar(5); //coleta 5 águas
 
-                aguaColetada += agua;
+                if (agua > 0) {
+                    aguaColetada += agua;
+                    baldeCheio = true; // <- AQUI muda a imagem
 
-                System.out.println("Coletou " + agua + " de agua. Total: " + aguaColetada);
+                    System.out.println("Coletou " + agua + " de agua. Total: " + aguaColetada);
+                }
             }
         }
     }
@@ -244,10 +255,18 @@ public class Main implements ApplicationListener {
         if (mapaAtual == 1) {
 
             spriteBatch.draw(florestaTexture, 0, 0, worldWidth, worldHeight);
+
+            spriteBatch.draw(arvoreTexture, arvoreX, arvoreY, 0.8f, 0.8f);
         
         } else if (mapaAtual == 2) {
 
             spriteBatch.draw(rioTexture, 0, 0, worldWidth, worldHeight);
+
+            if (baldeCheio) {
+                spriteBatch.draw(baldeCheioTexture, rioX, rioY, 0.2f, 0.2f);
+            } else {
+                spriteBatch.draw(baldeVazioTexture, rioX, rioY, 0.2f, 0.2f);
+            }
 
         }
 
@@ -275,5 +294,8 @@ public class Main implements ApplicationListener {
         florestaTexture.dispose();
         rioTexture.dispose();
         personagemTexture.dispose();
+        arvoreTexture.dispose();
+        baldeVazioTexture.dispose();
+        baldeCheioTexture.dispose();
     }
 }
