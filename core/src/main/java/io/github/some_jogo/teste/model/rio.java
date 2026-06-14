@@ -1,8 +1,8 @@
 package io.github.some_jogo.teste.model;
 
-public class rio  extends Recurso {
+public class Rio  extends Recurso {
 
-    public rio(int aguaDisponivel) {
+    public Rio(int aguaDisponivel) {
         super("Rio", aguaDisponivel);
     }
 }

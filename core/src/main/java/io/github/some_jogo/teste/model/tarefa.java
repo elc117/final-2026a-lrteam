@@ -1,6 +1,6 @@
 package io.github.some_jogo.teste.model;
 
-public class tarefa {
+public class Tarefa {
 
     private String nome;
     private String habilidadeNecessaria;

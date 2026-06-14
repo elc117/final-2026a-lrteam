@@ -1,10 +1,10 @@
 package io.github.some_jogo.teste.model;
 
-public class fogueira extends Estrutura {
+public class Fogueira extends Estrutura {
 
     private boolean acesa;
 
-    public fogueira() {
+    public Fogueira() {
         super("Fogueira");
         this.acesa = false;
     }

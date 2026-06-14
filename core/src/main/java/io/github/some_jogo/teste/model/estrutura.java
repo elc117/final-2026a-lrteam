@@ -1,9 +1,9 @@
 package io.github.some_jogo.teste.model;
 
-public class estrutura {
+public class Estrutura {
     protected String nome;
 
-    public estrutura(String nome) {
+    public Estrutura(String nome) {
         this.nome = nome;
     }
 

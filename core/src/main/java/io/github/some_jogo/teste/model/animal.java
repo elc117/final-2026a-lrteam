@@ -1,8 +1,8 @@
 package io.github.some_jogo.teste.model;
 
-public class animal  extends Recurso {
+public class Animal extends Recurso {
 
-    public animal(int carneDisponivel) {
+    public Animal(int carneDisponivel) {
         super("Animal", carneDisponivel);
     }
 }

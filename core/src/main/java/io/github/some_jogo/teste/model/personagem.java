@@ -1,6 +1,6 @@
 package io.github.some_jogo.teste.model;
 
-public class personagem {
+public class Personagem {
 
     private String nome;
     private String habilidade;

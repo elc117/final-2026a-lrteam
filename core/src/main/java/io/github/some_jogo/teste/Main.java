@@ -11,15 +11,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import io.github.some_jogo.teste.model.personagem;
-import io.github.some_jogo.teste.model.tarefa;
-import io.github.some_jogo.teste.model.grupo;
-import io.github.some_jogo.teste.model.animal;
-import io.github.some_jogo.teste.model.recurso;
-import io.github.some_jogo.teste.model.arvore;
-import io.github.some_jogo.teste.model.rio;
-import io.github.some_jogo.teste.model.fogueira;
-import io.github.some_jogo.teste.model.estrutura;
+import io.github.some_jogo.teste.model.Personagem;
+import io.github.some_jogo.teste.model.Tarefa;
+import io.github.some_jogo.teste.model.Grupo;
+import io.github.some_jogo.teste.model.Animal;
+import io.github.some_jogo.teste.model.Recurso;
+import io.github.some_jogo.teste.model.Arvore;
+import io.github.some_jogo.teste.model.Rio;
+import io.github.some_jogo.teste.model.Fogueira;
+import io.github.some_jogo.teste.model.Estrutura;
 
 
 
@@ -55,21 +55,21 @@ public class Main implements ApplicationListener {
 
         grupo = new Grupo();
 
-        personagem joao = new Personagem("João", "Pesca");
+        Personagem joao = new Personagem("João", "Pesca");
 
-        personagem ana = new Personagem("Ana", "Cura");
+        Personagem ana = new Personagem("Ana", "Cura");
 
-        personagem pedro = new Personagem("Pedro", "Fogo");
+        Personagem pedro = new Personagem("Pedro", "Fogo");
 
-        personagem cintia = new Personagem("Cintia", "Danca");
+        Personagem cintia = new Personagem("Cintia", "Danca");
 
-        personagem leo = new Personagem("Leo", "Construcao");
+        Personagem leo = new Personagem("Leo", "Construcao");
 
-        personagem rita = new Personagem("Rita", "Pilotar");
+        Personagem rita = new Personagem("Rita", "Pilotar");
 
-        personagem felipe = new Personagem("Felipe", "Agua");
+        Personagem felipe = new Personagem("Felipe", "Agua");
 
-        personagem anita = new Personagem("Anita", "Cantar");
+        Personagem anita = new Personagem("Anita", "Cantar");
 
 
         grupo.adicionar(joao);
