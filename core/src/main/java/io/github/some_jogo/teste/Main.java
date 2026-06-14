@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import io.github.some_jogo.teste.model.Personagem;
+import io.github.some_jogo.teste.model.Tarefa;
 import io.github.some_jogo.teste.model.Grupo;
 
 
@@ -24,6 +25,8 @@ public class Main implements ApplicationListener {
 
     SpriteBatch spriteBatch;
     FitViewport viewport;
+
+    Grupo grupo;
 
     // posição e estado do personagem
     float x = 0f, y = 0f;
@@ -39,9 +42,32 @@ public class Main implements ApplicationListener {
 
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(8, 5);
+        
 
         idleFrame = new TextureRegion(personagemTexture);
+
+        grupo = new Grupo();
+
+        Personagem joao = new Personagem("João", "Pesca");
+
+        Personagem ana = new Personagem("Ana", "Cura");
+
+        Personagem pedro = new Personagem("Pedro", "Fogo");
+
+        grupo.adicionar(joao);
+        grupo.adicionar(ana);
+        grupo.adicionar(pedro);
+
+
+        Tarefa pescar = new Tarefa("Pescar", "Pesca");
+
+        System.out.println("João pode pescar? " + pescar.podeSerRealizadaPor(joao));
+
+        System.out.println("Ana pode pescar? " + pescar.podeSerRealizadaPor(ana));
+        
+        System.out.println("Pedro pode pescar? " + pescar.podeSerRealizadaPor(pedro));
     }
+
 
     @Override
     public void resize(int width, int height) {
