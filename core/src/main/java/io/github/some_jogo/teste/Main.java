@@ -26,7 +26,8 @@ import io.github.some_jogo.teste.model.Estrutura;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main implements ApplicationListener {
-    Texture backgroundTexture;
+    Texture florestaTexture;
+    Texture rioTexture;
     Texture personagemTexture;
     Animation<TextureRegion> walkAnimation;
     TextureRegion idleFrame;
@@ -37,15 +38,32 @@ public class Main implements ApplicationListener {
     Grupo grupo;
     ArrayList<Personagem> sobreviventesDisponiveis;
 
+    Rio rio;
+    Arvore arvore;
+
+    int aguaColetada = 0;
+    int madeiraColetada = 0;
+
     // posição e estado do personagem
-    float x = 0f, y = 0f;
+    float x = 4f, y = 2f; // não começa mais na borda por causa da mudança de tela
     float stateTime = 0f;
     boolean moving = false;
     boolean facingLeft = false;
 
+    int mapaAtual = 1;
+
+    float arvoreX = 2f;
+    float arvoreY = 3f;
+
+    float rioX = 4f;
+    float rioY = 2f;
+
+    float distanciaInteracao = 1.5f; //coleta itens se estiver a 1.5 de distancia
+
     @Override
     public void create() {
-        backgroundTexture = new Texture("grama.png");
+        florestaTexture = new Texture("grama.png");
+        rioTexture = new Texture("rio.png");
         personagemTexture = new Texture("personagem.png");
         // Prepare your application here.
 
@@ -56,6 +74,9 @@ public class Main implements ApplicationListener {
         idleFrame = new TextureRegion(personagemTexture);
 
         grupo = new Grupo();
+
+        rio = new Rio(50);
+        arvore = new Arvore(30);
 
         sobreviventesDisponiveis = new ArrayList<>();
 
@@ -84,18 +105,18 @@ public class Main implements ApplicationListener {
         sobreviventesDisponiveis.add(felipe);
         sobreviventesDisponiveis.add(anita);
 
-        //testando funcionalidade 
+        //testando funcionalidade (deu certo)
         grupo.adicionar(joao);
         grupo.adicionar(ana);
         grupo.adicionar(pedro);
         grupo.adicionar(cintia);
         grupo.adicionar(leo);
 
-        System.out.println("Sobreviventes disponíveis: " + sobreviventesDisponiveis.size());
+        System.out.println("\nSobreviventes disponiveis: " + sobreviventesDisponiveis.size());
 
-        System.out.println("Membros do grupo: " + grupo.getQuantidadeMembros());
+        System.out.println("\nMembros do grupo: " + grupo.getQuantidadeMembros());
 
-        System.out.println("Grupo escolhido:");
+        System.out.println("\nGrupo escolhido:");
 
         for (Personagem p : grupo.getMembros()) {
             System.out.println(p.getNome() + " - " + p.getHabilidade());
@@ -106,7 +127,7 @@ public class Main implements ApplicationListener {
 
         Tarefa pescar = new Tarefa("Pescar", "Pesca");
 
-        System.out.println("Joao pode pescar? " + pescar.podeSerRealizadaPor(joao));
+        System.out.println("\nJoao pode pescar? " + pescar.podeSerRealizadaPor(joao));
 
         System.out.println("Ana pode pescar? " + pescar.podeSerRealizadaPor(ana));
         
@@ -142,6 +163,10 @@ public class Main implements ApplicationListener {
         if (Gdx.input.isKeyPressed(Keys.D)) { x += speed * delta; facingLeft = false; moving = true; }
         if (Gdx.input.isKeyPressed(Keys.W)) { y += speed * delta; moving = true; }
         if (Gdx.input.isKeyPressed(Keys.S)) { y -= speed * delta; moving = true; }
+
+        if (Gdx.input.isKeyJustPressed(Keys.E)) {
+            interagir();
+        }
     }
 
     private void logic() {
@@ -150,7 +175,57 @@ public class Main implements ApplicationListener {
         } else {
         stateTime = 0f; // reseta quando parado
         }
+
+        if (mapaAtual == 1 && y < 0) {
+            mapaAtual = 2;
+            y = viewport.getWorldHeight() - 1;
+        }
+
+        if (mapaAtual == 2 && y > viewport.getWorldHeight()) {
+
+            mapaAtual = 1;
+            y = 0;
+        }
+
+        if (x < 0) { //impede de sair pela borda da esquerda
+            x = 0;
+        }
+
+        if (x > viewport.getWorldWidth() - 1) { //impede de sair pela borda da direita
+            x = viewport.getWorldWidth() - 1;
+        }
     }
+
+    private float distancia(float x1, float y1, float x2, float y2) { //calcula a dist entre dois pontos
+            float dx = x1 - x2;
+            float dy = y1 - y2;
+
+        return (float)Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private void interagir() { //interagir com itens das tarefas (árvore, rio...)
+        
+        if (mapaAtual == 1) {
+            if (distancia(x, y, arvoreX, arvoreY) <= distanciaInteracao) {
+                int madeira = arvore.coletar(3); //coleta 3 madeiras
+
+                madeiraColetada += madeira;
+
+                System.out.println("Coletou " + madeira + " de madeira. Total: " + madeiraColetada);
+            }
+        }
+
+        if (mapaAtual == 2) {
+            if (distancia(x, y, rioX, rioY) <= distanciaInteracao) {
+                int agua = rio.coletar(5); //coleta 5 águas
+
+                aguaColetada += agua;
+
+                System.out.println("Coletou " + agua + " de agua. Total: " + aguaColetada);
+            }
+        }
+    }
+
 
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
@@ -166,7 +241,17 @@ public class Main implements ApplicationListener {
 
         TextureRegion frame = idleFrame;
 
-        spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight); // draw the background
+        if (mapaAtual == 1) {
+
+            spriteBatch.draw(florestaTexture, 0, 0, worldWidth, worldHeight);
+        
+        } else if (mapaAtual == 2) {
+
+            spriteBatch.draw(rioTexture, 0, 0, worldWidth, worldHeight);
+
+        }
+
+        
         spriteBatch.draw(frame, x, y, 1f, 1f);
         
 
@@ -187,7 +272,8 @@ public class Main implements ApplicationListener {
     public void dispose() {
         // Destroy application's resources here.
         spriteBatch.dispose();
-        backgroundTexture.dispose();
+        florestaTexture.dispose();
+        rioTexture.dispose();
         personagemTexture.dispose();
     }
 }
