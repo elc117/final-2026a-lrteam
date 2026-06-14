@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.ArrayList;
 
 import io.github.some_jogo.teste.model.Personagem;
 import io.github.some_jogo.teste.model.Tarefa;
@@ -34,6 +35,7 @@ public class Main implements ApplicationListener {
     FitViewport viewport;
 
     Grupo grupo;
+    ArrayList<Personagem> sobreviventesDisponiveis;
 
     // posição e estado do personagem
     float x = 0f, y = 0f;
@@ -55,7 +57,9 @@ public class Main implements ApplicationListener {
 
         grupo = new Grupo();
 
-        Personagem joao = new Personagem("João", "Pesca");
+        sobreviventesDisponiveis = new ArrayList<>();
+
+        Personagem joao = new Personagem("Joao", "Pesca");
 
         Personagem ana = new Personagem("Ana", "Cura");
 
@@ -65,33 +69,49 @@ public class Main implements ApplicationListener {
 
         Personagem leo = new Personagem("Leo", "Construcao");
 
-        Personagem rita = new Personagem("Rita", "Pilotar");
+        Personagem rita = new Personagem("Rita", "Piloto");
 
         Personagem felipe = new Personagem("Felipe", "Agua");
 
-        Personagem anita = new Personagem("Anita", "Cantar");
+        Personagem anita = new Personagem("Anita", "Canto");
 
+        sobreviventesDisponiveis.add(joao);
+        sobreviventesDisponiveis.add(ana);
+        sobreviventesDisponiveis.add(pedro);
+        sobreviventesDisponiveis.add(cintia);
+        sobreviventesDisponiveis.add(leo);
+        sobreviventesDisponiveis.add(rita);
+        sobreviventesDisponiveis.add(felipe);
+        sobreviventesDisponiveis.add(anita);
 
+        //testando funcionalidade 
         grupo.adicionar(joao);
         grupo.adicionar(ana);
         grupo.adicionar(pedro);
         grupo.adicionar(cintia);
         grupo.adicionar(leo);
-        grupo.adicionar(rita);
-        grupo.adicionar(felipe);
-        grupo.adicionar(anita);
+
+        System.out.println("Sobreviventes disponíveis: " + sobreviventesDisponiveis.size());
+
+        System.out.println("Membros do grupo: " + grupo.getQuantidadeMembros());
+
+        System.out.println("Grupo escolhido:");
+
+        for (Personagem p : grupo.getMembros()) {
+            System.out.println(p.getNome() + " - " + p.getHabilidade());
+        }
+        //fim teste
 
 
 
         Tarefa pescar = new Tarefa("Pescar", "Pesca");
 
-        System.out.println("João pode pescar? " + pescar.podeSerRealizadaPor(joao));
+        System.out.println("Joao pode pescar? " + pescar.podeSerRealizadaPor(joao));
 
         System.out.println("Ana pode pescar? " + pescar.podeSerRealizadaPor(ana));
         
         System.out.println("Pedro pode pescar? " + pescar.podeSerRealizadaPor(pedro));
     }
-
 
     @Override
     public void resize(int width, int height) {
