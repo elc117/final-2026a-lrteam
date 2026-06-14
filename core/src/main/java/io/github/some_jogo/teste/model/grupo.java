@@ -9,4 +9,22 @@ public class Grupo {
     public Grupo() {
         membros = new ArrayList<>();
     }
+
+    public boolean adicionar(Personagem personagem) {
+
+        if (membros.size() < 5) {
+            membros.add(personagem);
+            return true;
+        }
+
+        return false;
+    }
+
+    public ArrayList<Personagem> getMembros() {
+        return membros;
+    }
+
+    public int getQuantidadeMembros() {
+        return membros.size();
+    }
 }
