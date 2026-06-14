@@ -11,9 +11,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import io.github.some_jogo.teste.model.Personagem;
-import io.github.some_jogo.teste.model.Tarefa;
-import io.github.some_jogo.teste.model.Grupo;
+import io.github.some_jogo.teste.model.personagem;
+import io.github.some_jogo.teste.model.tarefa;
+import io.github.some_jogo.teste.model.grupo;
+import io.github.some_jogo.teste.model.animal;
+import io.github.some_jogo.teste.model.recurso;
+import io.github.some_jogo.teste.model.arvore;
+import io.github.some_jogo.teste.model.rio;
+import io.github.some_jogo.teste.model.fogueira;
+import io.github.some_jogo.teste.model.estrutura;
+
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -48,15 +55,32 @@ public class Main implements ApplicationListener {
 
         grupo = new Grupo();
 
-        Personagem joao = new Personagem("João", "Pesca");
+        personagem joao = new Personagem("João", "Pesca");
 
-        Personagem ana = new Personagem("Ana", "Cura");
+        personagem ana = new Personagem("Ana", "Cura");
 
-        Personagem pedro = new Personagem("Pedro", "Fogo");
+        personagem pedro = new Personagem("Pedro", "Fogo");
+
+        personagem cintia = new Personagem("Cintia", "Danca");
+
+        personagem leo = new Personagem("Leo", "Construcao");
+
+        personagem rita = new Personagem("Rita", "Pilotar");
+
+        personagem felipe = new Personagem("Felipe", "Agua");
+
+        personagem anita = new Personagem("Anita", "Cantar");
+
 
         grupo.adicionar(joao);
         grupo.adicionar(ana);
         grupo.adicionar(pedro);
+        grupo.adicionar(cintia);
+        grupo.adicionar(leo);
+        grupo.adicionar(rita);
+        grupo.adicionar(felipe);
+        grupo.adicionar(anita);
+
 
 
         Tarefa pescar = new Tarefa("Pescar", "Pesca");

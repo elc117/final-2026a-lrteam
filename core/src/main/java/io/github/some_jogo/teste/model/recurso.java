@@ -1,6 +1,6 @@
 package io.github.some_jogo.teste.model;
 
-public abstract class Recurso {
+public abstract class recurso {
 
     protected String nome;
     protected int quantidadeDisponivel;

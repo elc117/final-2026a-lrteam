@@ -2,7 +2,7 @@ package io.github.some_jogo.teste.model;
 
 import java.util.ArrayList;
 
-public class Grupo {
+public class grupo {
 
     private ArrayList<Personagem> membros;
 

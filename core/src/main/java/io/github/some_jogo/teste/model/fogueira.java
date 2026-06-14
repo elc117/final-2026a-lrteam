@@ -4,7 +4,7 @@ public class fogueira extends Estrutura {
 
     private boolean acesa;
 
-    public Fogueira() {
+    public fogueira() {
         super("Fogueira");
         this.acesa = false;
     }
