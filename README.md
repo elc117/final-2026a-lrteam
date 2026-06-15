@@ -56,8 +56,13 @@ Funcionalidades do jogo:
 ## Referências
 
 A Simple Game https://libgdx.com/wiki/start/a-simple-game
+
 Vídeo tutorial https://www.youtube.com/watch?v=aipDYyh1Mlc
+
 Background: https://zedpxl.itch.io/pixelart-forest-asset-pack
+
 Baldes: https://cazwolf.itch.io/caz-pixel-farmtools2
+
 Árvore: https://kenmi-art.itch.io/cute-fantasy-rpg
+
 Fogueira: https://dragonxvi.itch.io/dreams-of-dragons-fire#google_vignette
