@@ -53,6 +53,8 @@ Funcionalidades do jogo:
 
 ---
 
+Link itch.io: https://renatalauren.itch.io/gamesurvivors
+
 ## Referências
 
 A Simple Game https://libgdx.com/wiki/start/a-simple-game
