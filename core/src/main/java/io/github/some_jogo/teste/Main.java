@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import java.util.ArrayList;
@@ -20,12 +21,21 @@ import io.github.some_jogo.teste.model.Grupo;
 import io.github.some_jogo.teste.model.Arvore;
 import io.github.some_jogo.teste.model.Rio;
 
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+
 public class Main implements ApplicationListener {
 
-    Texture florestaTexture, rioTexture, arvoreTexture;
+    Texture florestaTexture, rioTexture, arvoreTexture, arvoreTroncoTexture;
     Texture baldeVazioTexture, baldeCheioTexture, madeiraTexture;
     Texture playerSheet;
     Texture fogoTexture;
+    Texture machadoTexture;
+    Texture fogueiraTexture;
+    Texture abrigoTexture;
+    Texture anzolTexture;
     Personagem personagemAgua;
     Personagem personagemFogo;
     Personagem personagemAtual;
@@ -41,69 +51,106 @@ public class Main implements ApplicationListener {
     FitViewport viewport;
     BitmapFont font;
 
+    TiledMap mapa1;
+    TiledMap mapa2;
+
+    OrthogonalTiledMapRenderer renderer1;
+    OrthogonalTiledMapRenderer renderer2;
+
+    OrthographicCamera camera;
+
     Grupo grupo;
     ArrayList<Personagem> sobreviventesDisponiveis;
 
-    // personagem
     float px = 1f, py = 2f;
     String direcao = "down";
     float stateTime = 0f;
     boolean moving = false;
 
-    // recursos
+    float playerSize = 3f;
+
     Rio rio;
     Arvore arvore;
     int aguaColetada = 0;
     int madeiraColetada = 0;
 
-    // mapa
     int mapaAtual = 1;
-    float arvoreX = 4.5f, arvoreY = 3.5f;
-    float rioX = 6.0f,    rioY = 1.0f;
-    float fogueiraX = 3.4f, fogueiraY = 1.9f;
-    float distanciaInteracao = 1.0f;
+    float arvoreX = 3f, arvoreY = 12f;
+    float rioX = 6.0f, rioY = 1.0f;
+    float baldeX = 18f, baldeY = 5f;
+    float distanciaInteracao = 1.5f;
+    float machadoX = 5f, machadoY = 14f;
+    float fogueiraX = 14.8f, fogueiraY = 4.8f;
+    float abrigoX = 14f, abrigoY = 11f;
+    float anzolX = 9.5f, anzolY = 5f;
+
+    // Defina aqui as dimensões do seu mapa (ajuste se necessário)
+    final float MAP_WIDTH = 30f;
+    final float MAP_HEIGHT = 20f;
 
     boolean fogueiraAcesa = false;
     boolean baldeCheio = false;
+    boolean arvoreCortada = false;
+    boolean abrigoConstruido = false;
     String mensagem = "";
     float mensagemTimer = 0f;
 
     @Override
     public void create() {
-        spriteBatch   = new SpriteBatch();
+        spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        viewport      = new FitViewport(8, 5);
-        font          = new BitmapFont();
+        
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(20, 12, camera);
+        viewport.apply();
+        camera.setToOrtho(false, 20, 12);
+        camera.update();
+
+        mapa1 = new TmxMapLoader().load("mapas/mapaFloresta.tmx");
+        mapa2 = new TmxMapLoader().load("mapas/mapaRio.tmx");
+
+        renderer1 = new OrthogonalTiledMapRenderer(mapa1, 1f / 16f);
+        renderer2 = new OrthogonalTiledMapRenderer(mapa2, 1f / 16f);
+        
+        mapaAtual = 1;
+        px = 14f;
+        py = 11f;
+
+        font = new BitmapFont();
         font.getData().setScale(0.03f);
 
-        florestaTexture   = new Texture("grama.png");
-        rioTexture        = new Texture("rio.png");
-        arvoreTexture     = new Texture("arvore.png");
-        madeiraTexture    = new Texture("madeira.png");
+        florestaTexture = new Texture("grama.png");
+        rioTexture = new Texture("rio.png");
+        arvoreTexture = new Texture("arvore.png");
+        arvoreTroncoTexture = new Texture("arvoreTronco.png");
+        madeiraTexture = new Texture("madeira.png");
         baldeVazioTexture = new Texture("baldeVazio.png");
         baldeCheioTexture = new Texture("baldeCheio.png");
         fogoTexture = new Texture("fogo.png");
+        machadoTexture = new Texture("machado.png");
+        fogueiraTexture = new Texture("fogueira.png");
+        abrigoTexture = new Texture("abrigo.png");
+        anzolTexture = new Texture("anzol.png");
 
         playerSheet = new Texture("personagemDois.png");
 
-        rio    = new Rio(50);
+        rio = new Rio(50);
         arvore = new Arvore(30);
 
         grupo = new Grupo();
         sobreviventesDisponiveis = new ArrayList<>();
 
-        Personagem joao   = new Personagem("Joao",   "Pesca");
-        Personagem ana    = new Personagem("Ana",    "Cura");
-        Personagem pedro  = new Personagem("Pedro",  "Fogo");
+        Personagem joao = new Personagem("Joao", "Pesca");
+        Personagem ana = new Personagem("Ana", "Cura");
+        Personagem pedro = new Personagem("Pedro", "Fogo");
         Personagem cintia = new Personagem("Cintia", "Danca");
-        Personagem leo    = new Personagem("Leo",    "Construcao");
-        Personagem rita   = new Personagem("Rita",   "Piloto");
+        Personagem leo = new Personagem("Leo", "Construcao");
+        Personagem rita = new Personagem("Rita", "Piloto");
         Personagem felipe = new Personagem("Felipe", "Agua");
-        Personagem anita  = new Personagem("Anita",  "Canto");
+        Personagem anita = new Personagem("Anita", "Canto");
 
         personagemAgua = felipe;
         personagemFogo = pedro;
-
         personagemAtual = personagemAgua;
 
         playerUmTexture = new Texture("personagem.png");
@@ -116,10 +163,6 @@ public class Main implements ApplicationListener {
 
         grupo.adicionar(joao); grupo.adicionar(ana);
         grupo.adicionar(pedro); grupo.adicionar(cintia); grupo.adicionar(leo);
-
-        Tarefa pescar = new Tarefa("Pescar", "Pesca");
-        System.out.println("Joao pode pescar? " + pescar.podeSerRealizadaPor(joao));
-        System.out.println("Ana pode pescar? "  + pescar.podeSerRealizadaPor(ana));
     }
 
     @Override
@@ -140,196 +183,178 @@ public class Main implements ApplicationListener {
         float delta = Gdx.graphics.getDeltaTime();
         moving = false;
 
-        if (Gdx.input.isKeyPressed(Keys.A)) { px -= speed * delta; direcao = "left";  moving = true; }
+        if (Gdx.input.isKeyPressed(Keys.A)) { px -= speed * delta; direcao = "left"; moving = true; }
         if (Gdx.input.isKeyPressed(Keys.D)) { px += speed * delta; direcao = "right"; moving = true; }
-        if (Gdx.input.isKeyPressed(Keys.W)) { py += speed * delta; direcao = "up";    moving = true; }
-        if (Gdx.input.isKeyPressed(Keys.S)) { py -= speed * delta; direcao = "down";  moving = true; }
+        if (Gdx.input.isKeyPressed(Keys.W)) { py += speed * delta; direcao = "up"; moving = true; }
+        if (Gdx.input.isKeyPressed(Keys.S)) { py -= speed * delta; direcao = "down"; moving = true; }
 
         if (Gdx.input.isKeyJustPressed(Keys.E)) interagir();
         if (Gdx.input.isKeyJustPressed(Keys.F)) acenderFogueira();
+        if (Gdx.input.isKeyJustPressed(Keys.B)) montarAbrigo();
 
-        if (mapaAtual == 1 && py < 0) { mapaAtual = 2; py = viewport.getWorldHeight() - 1; }
-        if (mapaAtual == 2 && py > viewport.getWorldHeight()) { mapaAtual = 1; py = 0; }
-
-        if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
-
-            if (personagemAtual == personagemAgua) {
-            personagemAtual = personagemFogo;
-            mostrarMensagem("Personagem: Pedro (Fogo)");
-        } else {
-        personagemAtual = personagemAgua;
-        mostrarMensagem("Personagem: Felipe (Agua)");
+        if (mapaAtual == 1 && py < 0) { 
+            mapaAtual = 2; 
+            py = MAP_HEIGHT - playerSize - 1; // Coloca o jogador um pouco abaixo do topo
         }
 
-}
+        // Se chegar perto do topo do mapa 2 (ajustado para o limite do clamp)
+        if (mapaAtual == 2 && py >= (MAP_HEIGHT - playerSize)) { 
+            mapaAtual = 1; 
+            py = 1; // Coloca o jogador na base do mapa 1
+        }
+
+        if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
+            if (personagemAtual == personagemAgua) {
+                personagemAtual = personagemFogo;
+                mostrarMensagem("Personagem: Pedro (Fogo)");
+            } else {
+                personagemAtual = personagemAgua;
+                mostrarMensagem("Personagem: Felipe (Agua)");
+            }
+        }
     }
 
     private void logic() {
         if (moving) stateTime += Gdx.graphics.getDeltaTime();
         else stateTime = 0f;
 
-        if (px < 0) px = 0;
-        if (px > viewport.getWorldWidth() - 1) px = viewport.getWorldWidth() - 1;
+        px = MathUtils.clamp(px, 0, MAP_WIDTH - playerSize);
+        py = MathUtils.clamp(py, 0, MAP_HEIGHT - playerSize);
 
         if (mensagemTimer > 0) mensagemTimer -= Gdx.graphics.getDeltaTime();
     }
 
     private void interagir() {
         if (mapaAtual == 1 && distancia(px, py, arvoreX, arvoreY) <= distanciaInteracao) {
-            int madeira = arvore.coletar(3);
-            madeiraColetada += madeira;
-            mostrarMensagem(madeira > 0
-                ? "Coletou 3 madeiras! Total: " + madeiraColetada
-                : "Arvore sem madeira!");
+            if (!arvoreCortada) {
+                int madeira = arvore.coletar(3);
+                madeiraColetada += madeira;
+
+                arvoreCortada = true;
+                mostrarMensagem("Coletou madeira!");
+            } else {
+                mostrarMensagem("Árvore já foi cortada!");
+            }
         }
-
-        if (mapaAtual == 2 && distancia(px, py, rioX, rioY) <= distanciaInteracao) {
-
+        if (mapaAtual == 2 && distancia(px, py, baldeX, baldeY) <= distanciaInteracao) {
             if (!personagemAtual.getHabilidade().equals("Agua")) {
-            mostrarMensagem("Somente Felipe pode coletar agua!");
-            return;
+                mostrarMensagem("Somente Felipe pode coletar agua!");
+                return;
+            }
+            int agua = rio.coletar(5);
+            if (agua > 0) { aguaColetada += agua; baldeCheio = true; }
+            mostrarMensagem(agua > 0 ? "Agua coletada!" : "Rio seco!");
         }
-
-        int agua = rio.coletar(5);
-
-        if (agua > 0) {
-            aguaColetada += agua;
-            baldeCheio = true;
-        }
-
-        mostrarMensagem(
-                agua > 0
-                ? "Agua coletada!"
-                : "Rio seco!"
-        );
-}
     }
 
     private void acenderFogueira() {
-
         if (!personagemAtual.getHabilidade().equals("Fogo")) {
             mostrarMensagem("Somente Pedro pode acender a fogueira!");
             return;
         }
-
         if (mapaAtual == 1 && distancia(px, py, fogueiraX, fogueiraY) <= distanciaInteracao) {
-            if (fogueiraAcesa) {
-                mostrarMensagem("A fogueira ja esta acesa!");
-            } else if (madeiraColetada >= 3) {
+            if (fogueiraAcesa) mostrarMensagem("Ja esta acesa!");
+            else if (madeiraColetada >= 3) {
                 fogueiraAcesa = true;
                 madeiraColetada -= 3;
-                mostrarMensagem("Fogueira acesa! Usou 3 madeiras.");
-            } else {
-                mostrarMensagem("Precisa de 3 madeiras! Voce tem: " + madeiraColetada);
-            }
+                mostrarMensagem("Fogueira acesa!");
+            } else mostrarMensagem("Precisa de 3 madeiras!");
         }
     }
 
     private String direcaoFogueira() {
-    float dx = fogueiraX - px;
-    float dy = fogueiraY - py;
-    float dist = distancia(px, py, fogueiraX, fogueiraY);
-
-    if (dist <= distanciaInteracao) return "Pressione F para acender a fogueira!";
-
-    // descobre a direção predominante
-    if (Math.abs(dx) > Math.abs(dy)) {
-        return "Fogueira fica para a " + (dx > 0 ? "DIREITA" : "ESQUERDA") + " (" + (int)dist + "m)";
-    } else {
-        return "Fogueira fica para " + (dy > 0 ? "CIMA" : "BAIXO") + " (" + (int)dist + "m)";
+        float dx = fogueiraX - px;
+        float dy = fogueiraY - py;
+        float dist = distancia(px, py, fogueiraX, fogueiraY);
+        if (dist <= distanciaInteracao) return "Pressione F!";
+        if (Math.abs(dx) > Math.abs(dy)) return "Fogueira: " + (dx > 0 ? "DIREITA" : "ESQUERDA");
+        else return "Fogueira: " + (dy > 0 ? "CIMA" : "BAIXO");
     }
-}
 
     private float distancia(float x1, float y1, float x2, float y2) {
         float dx = x1 - x2, dy = y1 - y2;
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-    private void mostrarMensagem(String msg) {
-        mensagem = msg;
-        mensagemTimer = 10f;
-        System.out.println(msg);
+    private void mostrarMensagem(String msg) { mensagem = msg; mensagemTimer = 10f; }
+
+    private void montarAbrigo() {
+        if (!abrigoConstruido) {
+            abrigoConstruido = true;
+            mostrarMensagem("Abrigo construído!");
+        } else {
+            mostrarMensagem("Abrigo já está pronto!");
+        }
     }
 
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
-        viewport.apply();
 
-        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        //LÓGICA DE TRAVAMENTO DA CÂMERA
+        float viewportHalfWidth = camera.viewportWidth / 2f;
+        float viewportHalfHeight = camera.viewportHeight / 2f;
+
+        float cameraX = MathUtils.clamp(px, viewportHalfWidth, MAP_WIDTH - viewportHalfWidth);
+        float cameraY = MathUtils.clamp(py, viewportHalfHeight, MAP_HEIGHT - viewportHalfHeight);
+
+        camera.position.set(cameraX, cameraY, 0);
+        camera.update();
+        // --------------------------------------
+
+        viewport.apply();
+        spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
 
-        float ww = viewport.getWorldWidth();
-        float wh = viewport.getWorldHeight();
-
         if (mapaAtual == 1) {
-            spriteBatch.draw(florestaTexture, 0, 0, ww, wh);
-            spriteBatch.draw(arvoreTexture, arvoreX, arvoreY, 0.8f, 0.8f);
-            
-            spriteBatch.draw(madeiraTexture, fogueiraX, fogueiraY, 0.8f, 0.4f);
-            if (fogueiraAcesa){
-                spriteBatch.draw(fogoTexture, fogueiraX, fogueiraY, 2.0f, 2.0f);
+            renderer1.setView(camera);
+            renderer1.render();
+            spriteBatch.draw(machadoTexture, machadoX, machadoY, 1.2f, 1.2f);
+            spriteBatch.draw(fogueiraTexture, fogueiraX, fogueiraY, 1.5f, 1.5f);
+            if (!arvoreCortada) {
+                spriteBatch.draw(arvoreTexture, arvoreX, arvoreY, 2f, 2f);
+            } else {
+                spriteBatch.draw(arvoreTroncoTexture, arvoreX + 0.5f, arvoreY, 1f, 1f);
             }
-            for (int m = 0; m < Math.min(madeiraColetada, 9); m++) {
-                spriteBatch.draw(madeiraTexture,
-                    0.1f + (m % 3) * 0.45f,
-                    0.1f + (m / 3) * 0.3f,
-                    0.4f, 0.22f);
+            if (fogueiraAcesa) {
+                float fogoX = 15.3f, fogoY = 5.5f;
+                spriteBatch.draw(fogoTexture, fogoX, fogoY, 0.6f, 0.6f);
+            }
+            if (abrigoConstruido) {
+                spriteBatch.draw(abrigoTexture, abrigoX, abrigoY, 3f, 3f);
             }
         } else if (mapaAtual == 2) {
-            spriteBatch.draw(rioTexture, 0, 0, ww, wh);
-            spriteBatch.draw(
-                baldeCheio ? baldeCheioTexture : baldeVazioTexture,
-                rioX - 0.5f, rioY, 0.5f, 0.5f);
+            renderer2.setView(camera);
+            renderer2.render();
+            spriteBatch.draw(anzolTexture, anzolX, anzolY, 0.5f, 0.5f);
+            spriteBatch.draw(baldeCheio ? baldeCheioTexture : baldeVazioTexture, baldeX, baldeY, 1f, 1f);
         }
+
+        spriteBatch.draw(personagemAtual == personagemAgua ? playerUmTexture : playerDoisTexture, px, py, playerSize, playerSize);
+
+        if (mensagemTimer > 0) font.draw(spriteBatch, mensagem, camera.position.x - 5, camera.position.y + 4);
+        font.draw(spriteBatch, "Madeira: " + madeiraColetada, camera.position.x - 9, camera.position.y + 5);
         
-        Texture spriteAtual;
-
-        if (personagemAtual == personagemAgua) {
-            spriteAtual = playerUmTexture;
-        } else {
-            spriteAtual = playerDoisTexture;
-        }
-
-        spriteBatch.draw(spriteAtual, px, py, 1f, 1f);
-
-        if (mensagemTimer > 0) {
-            font.setColor(Color.YELLOW);
-            font.draw(spriteBatch, mensagem, 0.2f, 4.0f);
-        }
-
-        font.setColor(Color.WHITE);
-        font.draw(spriteBatch, "Madeira: " + madeiraColetada + "  Agua: " + aguaColetada, 1.2f, 4.5f);
-        font.draw(spriteBatch, "[E] Coletar  [F] Fogueira  [W/S] Trocar mapa", 0.2f, 0.35f);
-        
-        if (mapaAtual == 1){
-            font.setColor(Color.CYAN);
-            font.draw(spriteBatch, direcaoFogueira(), 0.2f, 4.2f);
-        }
-
-        font.setColor(Color.WHITE);
-
-        font.draw(
-            spriteBatch,
-            "Atual: " + personagemAtual.getNome(),0.2f,3.8f);
-
         spriteBatch.end();
     }
 
     @Override public void pause() {}
     @Override public void resume() {}
-
-    @Override
-    public void dispose() {
+    @Override public void dispose() {
         spriteBatch.dispose();
         shapeRenderer.dispose();
         font.dispose();
         florestaTexture.dispose();
         rioTexture.dispose();
         arvoreTexture.dispose();
+        arvoreTroncoTexture.dispose();
         madeiraTexture.dispose();
+        machadoTexture.dispose();
         baldeVazioTexture.dispose();
         baldeCheioTexture.dispose();
-        playerSheet.dispose();
+        anzolTexture.dispose();
+        fogueiraTexture.dispose();
         fogoTexture.dispose();
+        abrigoTexture.dispose();
+        playerSheet.dispose();
     }
 }
