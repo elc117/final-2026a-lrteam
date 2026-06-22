@@ -43,6 +43,7 @@ public class Main implements ApplicationListener {
     Texture curaTexture;
     Texture mesaTexture;
     Texture copoTexture;
+    Texture aviaoTexture;
     Personagem personagemAtual;
     Personagem personagemAgua;
     Personagem personagemFogo;
@@ -107,7 +108,8 @@ public class Main implements ApplicationListener {
     float arbusto3X = 25.3f, arbusto3Y = 15.3f;
     float arbusto4X = 23.3f, arbusto4Y = 14.3f;
     float arbusto5X = 25.3f, arbusto5Y = 13.3f;
-    float cestaX = 21.5f, cestaY = 16f;
+    float cestaX = 21.5f, cestaY = 15f;
+    float aviaoX = 19f, aviaoY = 9f;
 
     final float MAP_WIDTH = 30f;
     final float MAP_HEIGHT = 20f;
@@ -186,6 +188,7 @@ public class Main implements ApplicationListener {
         curaTexture = new Texture("cura.png");
         mesaTexture = new Texture("mesa.png");
         copoTexture = new Texture("copo.png");
+        aviaoTexture = new Texture("aviao.png");
 
         rio = new Rio(50);
         arvore = new Arvore(30);
@@ -650,6 +653,7 @@ public class Main implements ApplicationListener {
         if (mapaAtual == 1) {
             renderer1.setView(camera);
             renderer1.render();
+            spriteBatch.draw(aviaoTexture, aviaoX, aviaoY, 9.5f, 9.5f);
             spriteBatch.draw(machadoTexture, machadoX, machadoY, 1.2f, 1.2f);
             if (fogueiraMontada) {
                 spriteBatch.draw(fogueiraTexture, fogueiraX, fogueiraY, 1.5f, 1.5f);
@@ -802,5 +806,6 @@ public class Main implements ApplicationListener {
         cestaTexture.dispose();
         frutoTexture.dispose();
         curaTexture.dispose();
+        aviaoTexture.dispose();
     }
 }
