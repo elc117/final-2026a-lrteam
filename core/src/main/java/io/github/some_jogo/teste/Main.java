@@ -28,6 +28,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class Main implements ApplicationListener {
 
+    private enum EstadoJogo {
+        INTRODUCAO,
+        SELECAO,
+        JOGANDO
+    }
+
+    private EstadoJogo estadoAtual = EstadoJogo.INTRODUCAO;
+
     Texture arvoreTexture, arvoreTroncoTexture;
     Texture baldeVazioTexture, baldeCheioTexture, madeiraTexture;
     Texture fogoTexture;
@@ -58,6 +66,15 @@ public class Main implements ApplicationListener {
 
     Animation<TextureRegion> walkDown, walkUp, walkLeft, walkRight;
     TextureRegion idleFrame;
+
+    // INTRODUÇÃO
+    private Texture[] framesAviao;
+    private Animation<TextureRegion> animacaoAviao;
+    private float tempoIntroducao = 0f;
+
+    // SELEÇÃO
+    private ArrayList<Personagem> sobreviventesSelecionados;
+    private int indiceSelecionado = 0;
 
     SpriteBatch spriteBatch;
     ShapeRenderer shapeRenderer;
@@ -166,7 +183,7 @@ public class Main implements ApplicationListener {
         py = 11f;
 
         font = new BitmapFont();
-        font.getData().setScale(0.03f);
+        font.getData().setScale(0.5f);
 
         arvoreTexture = new Texture("arvore.png");
         arvoreTroncoTexture = new Texture("arvoreTronco.png");
@@ -196,18 +213,21 @@ public class Main implements ApplicationListener {
         Personagem joao = new Personagem("Joao", "Pesca");
         Personagem ana = new Personagem("Ana", "Cura");
         Personagem pedro = new Personagem("Pedro", "Fogo");
-        Personagem cintia = new Personagem("Cintia", "Danca");
         Personagem leo = new Personagem("Leo", "Construcao");
-        Personagem rita = new Personagem("Rita", "Piloto");
         Personagem felipe = new Personagem("Felipe", "Agua");
-        Personagem anita = new Personagem("Anita", "Canto");
 
-        personagemAgua = felipe;
-        personagemAtual = personagemAgua;
-        personagemFogo = pedro;
-        personagemPesca = joao;
-        personagemConstrucao = leo;
-        personagemCura = ana;
+        Personagem cintia = new Personagem("Cintia", "Lideranca");
+        Personagem rita = new Personagem("Rita", "Piloto");
+        Personagem anita = new Personagem("Anita", "Comunicacao");
+        Personagem bruno = new Personagem("Bruno", "Cacador");
+        Personagem marina = new Personagem("Marina", "Botanica");
+
+        personagemAgua = null;
+        personagemAtual = null;
+        personagemFogo = null;
+        personagemPesca = null;
+        personagemConstrucao = null;
+        personagemCura = null;
 
         playerUmTexture = new Texture("personagem1.png");
         playerDoisTexture = new Texture("personagem2.png");
@@ -218,17 +238,31 @@ public class Main implements ApplicationListener {
         sobreviventesDisponiveis.add(joao);
         sobreviventesDisponiveis.add(ana);
         sobreviventesDisponiveis.add(pedro);
-        sobreviventesDisponiveis.add(cintia);
         sobreviventesDisponiveis.add(leo);
-        sobreviventesDisponiveis.add(rita);
         sobreviventesDisponiveis.add(felipe);
+        sobreviventesDisponiveis.add(cintia);
+        sobreviventesDisponiveis.add(rita);
         sobreviventesDisponiveis.add(anita);
+        sobreviventesDisponiveis.add(bruno);
+        sobreviventesDisponiveis.add(marina);
 
-        grupo.adicionar(joao);
-        grupo.adicionar(ana);
-        grupo.adicionar(pedro);
-        grupo.adicionar(cintia);
-        grupo.adicionar(leo);
+        sobreviventesSelecionados = new ArrayList<>();
+
+        framesAviao = new Texture[51];
+        TextureRegion[] regioes = new TextureRegion[51];
+
+        for(int i = 1; i <= 51; i++) {
+
+            String arquivo =
+                String.format(
+            "frames-aviao/ezgif-frame-%03d.png", i
+            );
+
+            framesAviao[i - 1] = new Texture(arquivo);
+            regioes[i - 1] = new TextureRegion(framesAviao[i - 1]);
+        }
+
+        animacaoAviao = new Animation<>(0.08f, regioes);
     }
 
     @Override
@@ -240,10 +274,192 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        input();
-        logic();
-        draw();
+
+        switch(estadoAtual) {
+   
+            case INTRODUCAO:
+                renderIntroducao();
+                break;
+
+            case SELECAO:
+                renderSelecao();
+                break;
+
+            case JOGANDO:
+                input();
+                logic();
+                draw();
+                break;
     }
+}
+    
+    private void renderIntroducao() {
+
+        ScreenUtils.clear(Color.BLACK);
+
+        tempoIntroducao += Gdx.graphics.getDeltaTime();
+
+        TextureRegion frameAtual =
+            animacaoAviao.getKeyFrame(tempoIntroducao);
+
+        spriteBatch.begin();
+
+        float largura = Gdx.graphics.getWidth();
+        float altura = Gdx.graphics.getHeight();
+
+        float w = frameAtual.getRegionWidth();
+        float h = frameAtual.getRegionHeight();
+
+        spriteBatch.draw(
+                frameAtual,
+                (largura - w) / 2f,
+                (altura - h) / 2f
+        );
+
+        font.draw(spriteBatch,
+            "ESPACO para pular",
+               20,
+               40);
+
+        spriteBatch.end();
+
+        if(Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+            estadoAtual = EstadoJogo.SELECAO;
+        }
+
+        if(animacaoAviao.isAnimationFinished(tempoIntroducao)) {
+            estadoAtual = EstadoJogo.SELECAO;
+        }
+}
+
+    private void renderSelecao() {
+
+        atualizarSelecao();
+
+        ScreenUtils.clear(Color.DARK_GRAY);
+
+        spriteBatch.begin();
+
+        float y = 11f;
+
+        font.draw(spriteBatch,
+        "O aviao caiu em uma regiao remota e isolada.",
+           1f,
+              y);
+
+        y -= 1f;
+
+        font.draw(spriteBatch,
+        "Escolha exatamente 5 sobreviventes.",
+           1f, y);
+
+        y -= 1f;
+
+        font.draw(spriteBatch,
+        "Dica: Escolha habilidades importantes para sobreviver.",
+           1f, y);
+
+        y -= 2f;
+
+        for(int i = 0; i < sobreviventesDisponiveis.size(); i++) {
+
+            Personagem p = sobreviventesDisponiveis.get(i);
+
+            String texto =
+                p.getNome()
+                + " - "
+                + p.getHabilidade();
+
+            if(i == indiceSelecionado)
+                texto = "> " + texto;
+
+            if(sobreviventesSelecionados.contains(p))
+                texto += " [SELECIONADO]";
+
+            font.draw(spriteBatch, texto, 1f, y);
+
+            y -= 0.8f;
+        }
+
+        font.draw(spriteBatch,
+            "Selecionados: " + sobreviventesSelecionados.size()
+            + "/5",1f,1f);
+
+        spriteBatch.end();
+    }
+
+    private void atualizarSelecao() {
+
+        if(Gdx.input.isKeyJustPressed(Keys.DOWN) ||
+            Gdx.input.isKeyJustPressed(Keys.S)) {
+
+            indiceSelecionado++;
+
+            if(indiceSelecionado >= sobreviventesDisponiveis.size())
+                indiceSelecionado = 0;
+        }
+
+        if(Gdx.input.isKeyJustPressed(Keys.UP) ||
+            Gdx.input.isKeyJustPressed(Keys.W)) {
+
+            indiceSelecionado--;
+
+            if(indiceSelecionado < 0)
+                indiceSelecionado =
+                    sobreviventesDisponiveis.size() - 1;
+        }
+
+        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+
+            Personagem escolhido =
+                sobreviventesDisponiveis.get(indiceSelecionado);
+
+            if(!sobreviventesSelecionados.contains(escolhido)) {
+
+                sobreviventesSelecionados.add(escolhido);
+
+                if(sobreviventesSelecionados.size() == 5) {
+                    finalizarSelecao();
+                }
+            }
+        }
+}
+
+    private void finalizarSelecao() {
+
+        grupo = new Grupo();
+
+        for(Personagem p : sobreviventesSelecionados) {
+
+            grupo.adicionar(p);
+
+            switch(p.getHabilidade()) {
+
+                    case "Agua":
+                        personagemAgua = p;
+                        break;
+
+                    case "Fogo":
+                        personagemFogo = p;
+                        break;
+
+                    case "Pesca":
+                        personagemPesca = p;
+                        break;
+
+                    case "Construcao":
+                        personagemConstrucao = p;
+                        break;
+
+                    case "Cura":
+                        personagemCura = p;
+                        break;
+        }
+    }
+        personagemAtual = sobreviventesSelecionados.get(0);
+
+        estadoAtual = EstadoJogo.JOGANDO;
+}
 
     private void input() {
         float speed = 3f;
@@ -298,22 +514,38 @@ public class Main implements ApplicationListener {
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.NUM_1)) {
-            personagemAtual = personagemAgua;
+            if(personagemAgua != null)
+                personagemAtual = personagemAgua;
+        else
+            mostrarMensagem("Nenhum sobrevivente possui a habilidade Agua!");
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.NUM_2)) {
-            personagemAtual = personagemFogo;
+            if(personagemFogo != null)
+                personagemAtual = personagemFogo;
+            else
+            mostrarMensagem("Nenhum sobrevivente possui a habilidade Fogo!");
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
-            personagemAtual = personagemPesca;
+            if(personagemPesca != null)
+                personagemAtual = personagemPesca;
+            else
+                mostrarMensagem("Nenhum sobrevivente possui a habilidade Pesca!");
         }
+
         if (Gdx.input.isKeyJustPressed(Keys.NUM_4)) {
-            personagemAtual = personagemConstrucao;
+            if(personagemConstrucao != null)
+                personagemAtual = personagemConstrucao;
+            else
+                mostrarMensagem("Nenhum sobrevivente possui a habilidade Construcao!");
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.NUM_5)) {
-            personagemAtual = personagemCura;
+            if(personagemCura != null)
+                personagemAtual = personagemCura;
+            else
+                mostrarMensagem("Nenhum sobrevivente possui a habilidade Cura!");
         }
     }
 
@@ -388,6 +620,11 @@ public class Main implements ApplicationListener {
     }
 
     private void montarFogueira() {
+
+        if(personagemFogo == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Fogo!");
+            return;
+        }
         if (!personagemAtual.getHabilidade().equals("Fogo")) {
             return;
         }
@@ -413,6 +650,12 @@ public class Main implements ApplicationListener {
     }
 
     private void acenderFogueira() {
+
+        if(personagemFogo == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Fogo!");
+           return;
+        }
+
         if (!personagemAtual.getHabilidade().equals("Fogo")) {
             mostrarMensagem("Somente Pedro pode acender a fogueira!");
             return;
@@ -455,6 +698,12 @@ public class Main implements ApplicationListener {
     }
 
     private void montarAbrigo() {
+
+        if(personagemConstrucao == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Construcao!");
+            return;
+        }
+
         if (!personagemAtual.getHabilidade().equals("Construcao")) {
             mostrarMensagem("Somente Leo pode construir o abrigo!");
             return;
@@ -477,6 +726,12 @@ public class Main implements ApplicationListener {
     }
 
     private void pescar() {
+
+        if(personagemPesca == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Pesca!");
+            return;
+        }
+
         if (!personagemAtual.getHabilidade().equals("Pesca")) {
             mostrarMensagem("Somente Joao pode pescar!");
             return;
@@ -578,6 +833,12 @@ public class Main implements ApplicationListener {
     }
 
     private void criarCura() {
+
+        if(personagemCura == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Cura!");
+            return;
+        }
+
         if (!personagemAtual.getHabilidade().equals("Cura")) {
             mostrarMensagem("Somente Ana pode produzir a cura!");
             return;
@@ -604,6 +865,11 @@ public class Main implements ApplicationListener {
     }
 
     private void entregarAgua() {
+
+        if(personagemAgua == null) {
+            mostrarMensagem("Seu grupo nao possui especialista em Agua!");
+            return;
+        }
         if (!personagemAtual.getHabilidade().equals("Agua"))
             return;
 
@@ -802,5 +1068,10 @@ public class Main implements ApplicationListener {
         cestaTexture.dispose();
         frutoTexture.dispose();
         curaTexture.dispose();
+
+        for(Texture t : framesAviao) {
+            if(t != null)
+                t.dispose();
+        }
     }
 }
