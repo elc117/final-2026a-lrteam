@@ -36,14 +36,23 @@ public class Main implements ApplicationListener {
     Texture abrigoTexture;
     Texture anzolTexture;
     Texture peixeTexture;
+    Texture arbustoTexture;
+    Texture arbustoFrutiferoTexture;
+    Texture cestaTexture;
+    Texture frutoTexture;
+    Texture curaTexture;
+    Personagem personagemAtual;
     Personagem personagemAgua;
     Personagem personagemFogo;
-    Personagem personagemAtual;
     Personagem personagemPesca;
+    Personagem personagemConstrucao;
+    Personagem personagemCura;
 
     Texture playerUmTexture;
     Texture playerDoisTexture;
     Texture playerTresTexture;
+    Texture playerQuatroTexture;
+    Texture playerCincoTexture;
 
     Animation<TextureRegion> walkDown, walkUp, walkLeft, walkRight;
     TextureRegion idleFrame;
@@ -74,34 +83,60 @@ public class Main implements ApplicationListener {
     Rio rio;
     Arvore arvore;
     int aguaColetada = 0;
-    int madeiraColetada = 0;
 
     int mapaAtual = 1;
-    float arvoreX = 3f, arvoreY = 12f;
+    float arvore1X = 3f, arvore1Y = 12f;
+    float arvore2X = 4f, arvore2Y = 13f;
     float rioX = 6.0f, rioY = 1.0f;
     float baldeX = 18f, baldeY = 5f;
-    float distanciaInteracao = 1.5f;
-    float machadoX = 5f, machadoY = 14f;
+    float distanciaInteracao = 2f;
+    float machadoX = 6f, machadoY = 14f;
     float fogueiraX = 14.8f, fogueiraY = 4.8f;
     float abrigoX = 14f, abrigoY = 11f;
     float anzolX = 10f, anzolY = 3.5f;
     float peixe1X = 8f, peixe1Y = 2f;
     float peixe2X = 12f, peixe2Y = 1f;
     float peixe3X = 13f, peixe3Y = 3f;
+    float peixe4X = 6f, peixe4Y = 1f;
+    float peixe5X = 10f, peixe5Y = 0f;
+    float arbusto1X = 25.3f, arbusto1Y = 17.3f;
+    float arbusto2X = 23.3f, arbusto2Y = 16.3f;
+    float arbusto3X = 25.3f, arbusto3Y = 15.3f;
+    float arbusto4X = 23.3f, arbusto4Y = 14.3f;
+    float arbusto5X = 25.3f, arbusto5Y = 13.3f;
+    float cestaX = 21.5f, cestaY = 16f;
 
-    // Defina aqui as dimensões do seu mapa (ajuste se necessário)
     final float MAP_WIDTH = 30f;
     final float MAP_HEIGHT = 20f;
 
-    boolean fogueiraAcesa = false;
     boolean baldeCheio = false;
-    boolean arvoreCortada = false;
+    boolean arvore1Cortada = false;
+    boolean arvore2Cortada = false;
+
+    boolean madeiraFogueiraColetada = false;
+    boolean madeiraAbrigoColetada = false;
+    boolean fogueiraMontada = false;
+    boolean fogueiraAcesa = false;
+
     boolean abrigoConstruido = false;
+
     boolean peixe1Pescado = false;
     boolean peixe2Pescado = false;
     boolean peixe3Pescado = false;
+    boolean peixe4Pescado = false;
+    boolean peixe5Pescado = false;
 
     int peixesColetados = 0;
+
+    boolean arbusto1Coletado = false;
+    boolean arbusto2Coletado = false;
+    boolean arbusto3Coletado = false;
+    boolean arbusto4Coletado = false;
+    boolean arbusto5Coletado = false;
+
+    int frutosColetados = 0;
+
+    boolean curaCriada = false;
 
     String mensagem = "";
     float mensagemTimer = 0f;
@@ -141,6 +176,11 @@ public class Main implements ApplicationListener {
         abrigoTexture = new Texture("abrigo.png");
         anzolTexture = new Texture("anzol.png");
         peixeTexture = new Texture("peixe.png");
+        arbustoTexture = new Texture("arbusto.png");
+        arbustoFrutiferoTexture = new Texture("arbustoFrutifero.png");
+        cestaTexture = new Texture("cesta.png");
+        frutoTexture = new Texture("fruto.png");
+        curaTexture = new Texture("cura.png");
 
         rio = new Rio(50);
         arvore = new Arvore(30);
@@ -158,13 +198,17 @@ public class Main implements ApplicationListener {
         Personagem anita = new Personagem("Anita", "Canto");
 
         personagemAgua = felipe;
-        personagemFogo = pedro;
         personagemAtual = personagemAgua;
+        personagemFogo = pedro;
         personagemPesca = joao;
+        personagemConstrucao = leo;
+        personagemCura = ana;
 
         playerUmTexture = new Texture("personagem1.png");
         playerDoisTexture = new Texture("personagem2.png");
         playerTresTexture = new Texture("personagem3.png");
+        playerQuatroTexture = new Texture("personagem4.png");
+        playerCincoTexture = new Texture("personagem5.png");
 
         sobreviventesDisponiveis.add(joao);
         sobreviventesDisponiveis.add(ana);
@@ -230,6 +274,16 @@ public class Main implements ApplicationListener {
             montarAbrigo();
         if (Gdx.input.isKeyJustPressed(Keys.P))
             pescar();
+        if (Gdx.input.isKeyJustPressed(Keys.C)) {
+
+            if (personagemAtual.getHabilidade().equals("Fogo")) {
+                montarFogueira();
+            }
+
+            if (personagemAtual.getHabilidade().equals("Cura")) {
+                criarCura();
+            }
+        }
 
         if (mapaAtual == 1 && py < 0) {
             mapaAtual = 2;
@@ -253,6 +307,13 @@ public class Main implements ApplicationListener {
         if (Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
             personagemAtual = personagemPesca;
         }
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_4)) {
+            personagemAtual = personagemConstrucao;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_5)) {
+            personagemAtual = personagemCura;
+        }
     }
 
     private void logic() {
@@ -269,17 +330,43 @@ public class Main implements ApplicationListener {
     }
 
     private void interagir() {
-        if (mapaAtual == 1 && distancia(px, py, arvoreX, arvoreY) <= distanciaInteracao) {
-            if (!arvoreCortada) {
-                int madeira = arvore.coletar(3);
-                madeiraColetada += madeira;
+        if (mapaAtual == 1) {
 
-                arvoreCortada = true;
-                mostrarMensagem("Coletou madeira!");
-            } else {
-                mostrarMensagem("Árvore já foi cortada!");
+            // arvore pedro
+            if (distancia(px, py, arvore1X, arvore1Y) <= distanciaInteracao) {
+                if (!personagemAtual.getHabilidade().equals("Fogo")) {
+                    mostrarMensagem("Somente Pedro pode cortar esta arvore!");
+                    return;
+                }
+                if (madeiraFogueiraColetada) {
+                    mostrarMensagem("Madeira para fogueira coletada!");
+                    return;
+                }
+                arvore1Cortada = true;
+                madeiraFogueiraColetada = true;
+
+                mostrarMensagem("Madeira para a fogueira coletada!");
+                return;
+            }
+
+            // arvore leo
+            if (distancia(px, py, arvore2X, arvore2Y) <= distanciaInteracao) {
+                if (!personagemAtual.getHabilidade().equals("Construcao")) {
+                    mostrarMensagem("Somente Leo pode cortar esta arvore!");
+                    return;
+                }
+                if (madeiraAbrigoColetada) {
+                    mostrarMensagem("Madeira para abrigo coletada!");
+                    return;
+                }
+                arvore2Cortada = true;
+                madeiraAbrigoColetada = true;
+
+                mostrarMensagem("Madeira para o abrigo coletada!");
+                return;
             }
         }
+
         if (mapaAtual == 2 && distancia(px, py, baldeX, baldeY) <= distanciaInteracao) {
             if (!personagemAtual.getHabilidade().equals("Agua")) {
                 mostrarMensagem("Somente Felipe pode coletar agua!");
@@ -292,6 +379,35 @@ public class Main implements ApplicationListener {
             }
             mostrarMensagem(agua > 0 ? "Agua coletada!" : "Rio seco!");
         }
+
+        if (mapaAtual == 2 && personagemAtual.getHabilidade().equals("Cura")) {
+            coletarFrutos();
+        }
+    }
+
+    private void montarFogueira() {
+        if (!personagemAtual.getHabilidade().equals("Fogo")) {
+            return;
+        }
+
+        if (!madeiraFogueiraColetada) {
+            mostrarMensagem("Colete madeira primeiro!");
+            return;
+        }
+
+        if (fogueiraMontada) {
+            mostrarMensagem("Fogueira ja montada!");
+            return;
+        }
+
+        if (distancia(px, py, fogueiraX, fogueiraY) > distanciaInteracao) {
+            mostrarMensagem("Va ate o local da fogueira!");
+            return;
+        }
+
+        fogueiraMontada = true;
+
+        mostrarMensagem("Fogueira montada!");
     }
 
     private void acenderFogueira() {
@@ -299,16 +415,19 @@ public class Main implements ApplicationListener {
             mostrarMensagem("Somente Pedro pode acender a fogueira!");
             return;
         }
-        if (mapaAtual == 1 && distancia(px, py, fogueiraX, fogueiraY) <= distanciaInteracao) {
-            if (fogueiraAcesa)
-                mostrarMensagem("Ja esta acesa!");
-            else if (madeiraColetada >= 3) {
-                fogueiraAcesa = true;
-                madeiraColetada -= 3;
-                mostrarMensagem("Fogueira acesa!");
-            } else
-                mostrarMensagem("Precisa de 3 madeiras!");
+        if (distancia(px, py, fogueiraX, fogueiraY) > distanciaInteracao) {
+            return;
         }
+        if (!fogueiraMontada) {
+            mostrarMensagem("Monte a fogueira primeiro!");
+            return;
+        }
+        if (fogueiraAcesa) {
+            mostrarMensagem("Ja esta acesa!");
+            return;
+        }
+        fogueiraAcesa = true;
+        mostrarMensagem("Fogueira acesa!");
     }
 
     private String direcaoFogueira() {
@@ -334,16 +453,28 @@ public class Main implements ApplicationListener {
     }
 
     private void montarAbrigo() {
-        if (!abrigoConstruido) {
-            abrigoConstruido = true;
-            mostrarMensagem("Abrigo construído!");
-        } else {
-            mostrarMensagem("Abrigo já está pronto!");
+        if (!personagemAtual.getHabilidade().equals("Construcao")) {
+            mostrarMensagem("Somente Leo pode construir o abrigo!");
+            return;
         }
+
+        if (abrigoConstruido) {
+            mostrarMensagem("Abrigo ja esta pronto!");
+            return;
+        }
+
+        if (!madeiraAbrigoColetada) {
+            mostrarMensagem("Colete a madeira do abrigo primeiro!");
+            return;
+        }
+
+        madeiraAbrigoColetada = false;
+        abrigoConstruido = true;
+
+        mostrarMensagem("Abrigo construido!");
     }
 
     private void pescar() {
-
         if (!personagemAtual.getHabilidade().equals("Pesca")) {
             mostrarMensagem("Somente Joao pode pescar!");
             return;
@@ -379,7 +510,90 @@ public class Main implements ApplicationListener {
             return;
         }
 
+        if (!peixe4Pescado) {
+            peixe4Pescado = true;
+            peixesColetados++;
+            mostrarMensagem("Peixe capturado!");
+            return;
+        }
+
+        if (!peixe5Pescado) {
+            peixe5Pescado = true;
+            peixesColetados++;
+            mostrarMensagem("Peixe capturado!");
+            return;
+        }
+
         mostrarMensagem("Nao ha mais peixes neste rio!");
+    }
+
+    private void coletarFrutos() {
+        if (!personagemAtual.getHabilidade().equals("Cura")) {
+            mostrarMensagem("Somente Ana pode coletar frutos!");
+            return;
+        }
+
+        if (mapaAtual != 2) {
+            return;
+        }
+
+        if (!arbusto1Coletado && distancia(px, py, arbusto1X, arbusto1Y) <= distanciaInteracao) {
+            arbusto1Coletado = true;
+            frutosColetados++;
+            mostrarMensagem("Fruto coletado!");
+            return;
+        }
+
+        if (!arbusto2Coletado && distancia(px, py, arbusto2X, arbusto2Y) <= distanciaInteracao) {
+            arbusto2Coletado = true;
+            frutosColetados++;
+            mostrarMensagem("Fruto coletado!");
+            return;
+        }
+
+        if (!arbusto3Coletado && distancia(px, py, arbusto3X, arbusto3Y) <= distanciaInteracao) {
+            arbusto3Coletado = true;
+            frutosColetados++;
+            mostrarMensagem("Fruto coletado!");
+            return;
+        }
+
+        if (!arbusto4Coletado && distancia(px, py, arbusto4X, arbusto4Y) <= distanciaInteracao) {
+            arbusto4Coletado = true;
+            frutosColetados++;
+            mostrarMensagem("Fruto coletado!");
+            return;
+        }
+
+        if (!arbusto5Coletado && distancia(px, py, arbusto5X, arbusto5Y) <= distanciaInteracao) {
+            arbusto5Coletado = true;
+            frutosColetados++;
+            mostrarMensagem("Fruto coletado!");
+            return;
+        }
+
+        mostrarMensagem("Nenhum arbusto por perto!");
+    }
+
+    private void criarCura() {
+        if (!personagemAtual.getHabilidade().equals("Cura")) {
+            mostrarMensagem("Somente Ana pode produzir a cura!");
+            return;
+        }
+
+        if (curaCriada) {
+            mostrarMensagem("A cura ja foi produzida!");
+            return;
+        }
+
+        if (frutosColetados < 5) {
+            mostrarMensagem("Colete os 5 frutos primeiro!");
+            return;
+        }
+
+        frutosColetados = 0;
+        curaCriada = true;
+        mostrarMensagem("Cura produzida!");
     }
 
     private void draw() {
@@ -404,12 +618,23 @@ public class Main implements ApplicationListener {
             renderer1.setView(camera);
             renderer1.render();
             spriteBatch.draw(machadoTexture, machadoX, machadoY, 1.2f, 1.2f);
-            spriteBatch.draw(fogueiraTexture, fogueiraX, fogueiraY, 1.5f, 1.5f);
-            if (!arvoreCortada) {
-                spriteBatch.draw(arvoreTexture, arvoreX, arvoreY, 2f, 2f);
-            } else {
-                spriteBatch.draw(arvoreTroncoTexture, arvoreX + 0.5f, arvoreY, 1f, 1f);
+            if (fogueiraMontada) {
+                spriteBatch.draw(fogueiraTexture, fogueiraX, fogueiraY, 1.5f, 1.5f);
             }
+
+            // arvore leo
+            if (!arvore2Cortada) {
+                spriteBatch.draw(arvoreTexture, arvore2X, arvore2Y, 2f, 2f);
+            } else {
+                spriteBatch.draw(arvoreTroncoTexture, arvore2X + 0.5f, arvore2Y, 1f, 1f);
+            }
+            // arvore pedro
+            if (!arvore1Cortada) {
+                spriteBatch.draw(arvoreTexture, arvore1X, arvore1Y, 2f, 2f);
+            } else {
+                spriteBatch.draw(arvoreTroncoTexture, arvore1X + 0.5f, arvore1Y, 1f, 1f);
+            }
+
             if (fogueiraAcesa) {
                 float fogoX = 15.3f, fogoY = 5.5f;
                 spriteBatch.draw(fogoTexture, fogoX, fogoY, 0.6f, 0.6f);
@@ -417,11 +642,40 @@ public class Main implements ApplicationListener {
             if (abrigoConstruido) {
                 spriteBatch.draw(abrigoTexture, abrigoX, abrigoY, 3f, 3f);
             }
+
         } else if (mapaAtual == 2) {
             renderer2.setView(camera);
             renderer2.render();
             spriteBatch.draw(anzolTexture, anzolX, anzolY, 0.5f, 0.5f);
             spriteBatch.draw(baldeCheio ? baldeCheioTexture : baldeVazioTexture, baldeX, baldeY, 0.7f, 0.7f);
+
+            spriteBatch.draw(cestaTexture, cestaX, cestaY, 0.8f, 0.8f);
+
+            if (frutosColetados >= 1)
+                spriteBatch.draw(frutoTexture, cestaX - 0.15f, cestaY + 0.05f, 0.8f, 0.8f);
+
+            if (frutosColetados >= 2)
+                spriteBatch.draw(frutoTexture, cestaX + 0.05f, cestaY + 0.05f, 0.8f, 0.8f);
+
+            if (frutosColetados >= 3)
+                spriteBatch.draw(frutoTexture, cestaX + 0.25f, cestaY + 0.05f, 0.8f, 0.8f);
+
+            if (frutosColetados >= 4)
+                spriteBatch.draw(frutoTexture, cestaX - 0.05f, cestaY + 0.20f, 0.8f, 0.8f);
+
+            if (frutosColetados >= 5)
+                spriteBatch.draw(frutoTexture, cestaX + 0.15f, cestaY + 0.20f, 0.8f, 0.8f);
+
+            spriteBatch.draw(arbusto1Coletado ? arbustoTexture : arbustoFrutiferoTexture, arbusto1X, arbusto1Y, 1.5f,
+                    1.5f);
+            spriteBatch.draw(arbusto2Coletado ? arbustoTexture : arbustoFrutiferoTexture, arbusto2X, arbusto2Y, 1.5f,
+                    1.5f);
+            spriteBatch.draw(arbusto3Coletado ? arbustoTexture : arbustoFrutiferoTexture, arbusto3X, arbusto3Y, 1.5f,
+                    1.5f);
+            spriteBatch.draw(arbusto4Coletado ? arbustoTexture : arbustoFrutiferoTexture, arbusto4X, arbusto4Y, 1.6f,
+                    1.6f);
+            spriteBatch.draw(arbusto5Coletado ? arbustoTexture : arbustoFrutiferoTexture, arbusto5X, arbusto5Y, 1.6f,
+                    1.6f);
 
             if (!peixe1Pescado)
                 spriteBatch.draw(peixeTexture, peixe1X, peixe1Y, 0.6f, 0.6f);
@@ -431,6 +685,12 @@ public class Main implements ApplicationListener {
 
             if (!peixe3Pescado)
                 spriteBatch.draw(peixeTexture, peixe3X, peixe3Y, 0.6f, 0.6f);
+
+            if (!peixe4Pescado)
+                spriteBatch.draw(peixeTexture, peixe4X, peixe4Y, 0.6f, 0.6f);
+
+            if (!peixe5Pescado)
+                spriteBatch.draw(peixeTexture, peixe5X, peixe5Y, 0.6f, 0.6f);
         }
 
         Texture texturaAtual;
@@ -441,18 +701,26 @@ public class Main implements ApplicationListener {
             texturaAtual = playerDoisTexture;
         } else if (personagemAtual == personagemPesca) {
             texturaAtual = playerTresTexture;
+        } else if (personagemAtual == personagemConstrucao) {
+            texturaAtual = playerQuatroTexture;
+        } else if (personagemAtual == personagemCura) {
+            texturaAtual = playerCincoTexture;
         } else {
             texturaAtual = playerUmTexture;
         }
 
         spriteBatch.draw(texturaAtual, px, py, playerSize, playerSize);
+        if (curaCriada && personagemAtual == personagemCura) {
+            float curaX = px + 0.55f, curaY = py + 0.15f;
+
+            spriteBatch.draw(curaTexture, curaX, curaY, 0.45f, 0.45f);
+        }
 
         if (mensagemTimer > 0)
             font.draw(spriteBatch, mensagem, camera.position.x - 5, camera.position.y + 4);
-        font.draw(spriteBatch, "Madeira: " + madeiraColetada, camera.position.x - 9, camera.position.y + 5);
-        font.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 4);
+            font.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 4);
 
-        spriteBatch.end();
+            spriteBatch.end();
     }
 
     @Override
@@ -482,5 +750,12 @@ public class Main implements ApplicationListener {
         playerDoisTexture.dispose();
         playerTresTexture.dispose();
         peixeTexture.dispose();
+        playerQuatroTexture.dispose();
+        arbustoTexture.dispose();
+        arbustoFrutiferoTexture.dispose();
+        playerCincoTexture.dispose();
+        cestaTexture.dispose();
+        frutoTexture.dispose();
+        curaTexture.dispose();
     }
 }
