@@ -266,23 +266,18 @@ public class Main implements ApplicationListener {
             moving = true;
         }
 
-        if (Gdx.input.isKeyJustPressed(Keys.E))
+        if (Gdx.input.isKeyJustPressed(Keys.E)) {
             interagir();
+            pescar();
+        }
+
         if (Gdx.input.isKeyJustPressed(Keys.F))
             acenderFogueira();
-        if (Gdx.input.isKeyJustPressed(Keys.B))
-            montarAbrigo();
-        if (Gdx.input.isKeyJustPressed(Keys.P))
-            pescar();
+
         if (Gdx.input.isKeyJustPressed(Keys.C)) {
-
-            if (personagemAtual.getHabilidade().equals("Fogo")) {
-                montarFogueira();
-            }
-
-            if (personagemAtual.getHabilidade().equals("Cura")) {
-                criarCura();
-            }
+            montarFogueira();
+            montarAbrigo();
+            criarCura();
         }
 
         if (mapaAtual == 1 && py < 0) {
@@ -718,9 +713,9 @@ public class Main implements ApplicationListener {
 
         if (mensagemTimer > 0)
             font.draw(spriteBatch, mensagem, camera.position.x - 5, camera.position.y + 4);
-            font.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 4);
+        font.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 4);
 
-            spriteBatch.end();
+        spriteBatch.end();
     }
 
     @Override
