@@ -61,10 +61,10 @@ A Simple Game https://libgdx.com/wiki/start/a-simple-game
 
 Vídeo tutorial https://www.youtube.com/watch?v=aipDYyh1Mlc
 
-Background: https://zedpxl.itch.io/pixelart-forest-asset-pack
+Backgrounds e assets usados no tiled: https://danieldiggle.itch.io/sunnyside
 
-Baldes: https://cazwolf.itch.io/caz-pixel-farmtools2
+Personagens: https://farm-animal.itch.io/character-pack
 
-Árvore: https://kenmi-art.itch.io/cute-fantasy-rpg
+Fogueira e machado: https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
 
-Fogueira: https://dragonxvi.itch.io/dreams-of-dragons-fire#google_vignette
+Abrigo: https://thomaswastaken.itch.io/tileset
