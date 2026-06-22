@@ -41,6 +41,8 @@ public class Main implements ApplicationListener {
     Texture cestaTexture;
     Texture frutoTexture;
     Texture curaTexture;
+    Texture mesaTexture;
+    Texture copoTexture;
     Personagem personagemAtual;
     Personagem personagemAgua;
     Personagem personagemFogo;
@@ -93,6 +95,7 @@ public class Main implements ApplicationListener {
     float machadoX = 6f, machadoY = 14f;
     float fogueiraX = 14.8f, fogueiraY = 4.8f;
     float abrigoX = 14f, abrigoY = 11f;
+    float mesaX = 13f, mesaY = 11f;
     float anzolX = 10f, anzolY = 3.5f;
     float peixe1X = 8f, peixe1Y = 2f;
     float peixe2X = 12f, peixe2Y = 1f;
@@ -110,14 +113,15 @@ public class Main implements ApplicationListener {
     final float MAP_HEIGHT = 20f;
 
     boolean baldeCheio = false;
+    boolean carregandoAgua = false;
+    boolean aguaEntregue = false;
+
     boolean arvore1Cortada = false;
     boolean arvore2Cortada = false;
-
     boolean madeiraFogueiraColetada = false;
     boolean madeiraAbrigoColetada = false;
     boolean fogueiraMontada = false;
     boolean fogueiraAcesa = false;
-
     boolean abrigoConstruido = false;
 
     boolean peixe1Pescado = false;
@@ -133,10 +137,9 @@ public class Main implements ApplicationListener {
     boolean arbusto3Coletado = false;
     boolean arbusto4Coletado = false;
     boolean arbusto5Coletado = false;
+    boolean curaCriada = false;
 
     int frutosColetados = 0;
-
-    boolean curaCriada = false;
 
     String mensagem = "";
     float mensagemTimer = 0f;
@@ -181,6 +184,8 @@ public class Main implements ApplicationListener {
         cestaTexture = new Texture("cesta.png");
         frutoTexture = new Texture("fruto.png");
         curaTexture = new Texture("cura.png");
+        mesaTexture = new Texture("mesa.png");
+        copoTexture = new Texture("copo.png");
 
         rio = new Rio(50);
         arvore = new Arvore(30);
@@ -275,6 +280,7 @@ public class Main implements ApplicationListener {
             acenderFogueira();
 
         if (Gdx.input.isKeyJustPressed(Keys.C)) {
+            entregarAgua();
             montarFogueira();
             montarAbrigo();
             criarCura();
@@ -371,6 +377,7 @@ public class Main implements ApplicationListener {
             if (agua > 0) {
                 aguaColetada += agua;
                 baldeCheio = true;
+                carregandoAgua = true;
             }
             mostrarMensagem(agua > 0 ? "Agua coletada!" : "Rio seco!");
         }
@@ -586,15 +593,46 @@ public class Main implements ApplicationListener {
             return;
         }
 
+        if (distancia(px, py, cestaX, cestaY) > distanciaInteracao) {
+            mostrarMensagem("Va ate a cesta para preparar a cura!");
+            return;
+        }
+
         frutosColetados = 0;
         curaCriada = true;
         mostrarMensagem("Cura produzida!");
     }
 
+    private void entregarAgua() {
+        if (!personagemAtual.getHabilidade().equals("Agua"))
+            return;
+
+        if (!carregandoAgua) {
+            mostrarMensagem("Colete agua primeiro!");
+            return;
+        }
+
+        if (!abrigoConstruido) {
+            mostrarMensagem("Construa o abrigo primeiro!");
+            return;
+        }
+
+        if (distancia(px, py, mesaX, mesaY) > distanciaInteracao) {
+            mostrarMensagem("Va ate a mesa do abrigo!");
+            return;
+        }
+
+        carregandoAgua = false;
+        aguaEntregue = true;
+        baldeCheio = false;
+
+        mostrarMensagem("Agua entregue!");
+    }
+
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
 
-        // LÓGICA DE TRAVAMENTO DA CÂMERA
+        // trava a camera
         float viewportHalfWidth = camera.viewportWidth / 2f;
         float viewportHalfHeight = camera.viewportHeight / 2f;
 
@@ -636,13 +674,21 @@ public class Main implements ApplicationListener {
             }
             if (abrigoConstruido) {
                 spriteBatch.draw(abrigoTexture, abrigoX, abrigoY, 3f, 3f);
+                spriteBatch.draw(mesaTexture, mesaX, mesaY, 1.5f, 1.5f);
+
+                if (aguaEntregue) {
+                    spriteBatch.draw(copoTexture, mesaX + 0.2f, mesaY + 0.4f, 0.6f, 0.6f);
+                    spriteBatch.draw(copoTexture, mesaX + 0.6f, mesaY + 0.4f, 0.6f, 0.6f);
+                }
             }
 
         } else if (mapaAtual == 2) {
             renderer2.setView(camera);
             renderer2.render();
             spriteBatch.draw(anzolTexture, anzolX, anzolY, 0.5f, 0.5f);
-            spriteBatch.draw(baldeCheio ? baldeCheioTexture : baldeVazioTexture, baldeX, baldeY, 0.7f, 0.7f);
+            if (!carregandoAgua) {
+                spriteBatch.draw(baldeCheio ? baldeCheioTexture : baldeVazioTexture, baldeX, baldeY, 0.7f, 0.7f);
+            }
 
             spriteBatch.draw(cestaTexture, cestaX, cestaY, 0.8f, 0.8f);
 
@@ -705,6 +751,10 @@ public class Main implements ApplicationListener {
         }
 
         spriteBatch.draw(texturaAtual, px, py, playerSize, playerSize);
+
+        if (carregandoAgua) {
+            spriteBatch.draw(baldeCheioTexture, px + 0.6f, py + 0.1f, 0.7f, 0.7f);
+        }
         if (curaCriada && personagemAtual == personagemCura) {
             float curaX = px + 0.55f, curaY = py + 0.15f;
 
