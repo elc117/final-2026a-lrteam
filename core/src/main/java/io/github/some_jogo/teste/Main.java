@@ -164,8 +164,8 @@ public class Main implements ApplicationListener {
         renderer2 = new OrthogonalTiledMapRenderer(mapa2, 1f / 16f);
 
         mapaAtual = 1;
-        px = 14f;
-        py = 11f;
+        px = 20.5f;
+        py = 10.5f;
 
         font = new BitmapFont();
         font.getData().setScale(0.03f);
