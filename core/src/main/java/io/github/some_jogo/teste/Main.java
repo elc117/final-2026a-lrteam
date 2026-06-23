@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import java.util.ArrayList;
+import com.badlogic.gdx.Input;
 
 import io.github.some_jogo.teste.model.Personagem;
 import io.github.some_jogo.teste.model.Tarefa;
@@ -30,6 +31,7 @@ public class Main implements ApplicationListener {
 
     private enum EstadoJogo {
         INTRODUCAO,
+        MENU_INICIAR,
         SELECAO,
         JOGANDO
     }
@@ -67,6 +69,12 @@ public class Main implements ApplicationListener {
 
     Animation<TextureRegion> walkDown, walkUp, walkLeft, walkRight;
     TextureRegion idleFrame;
+
+    private Texture cardMenuIniciarTexture;
+    private Texture cardSelecaoTexture;
+
+    private BitmapFont gameFont;
+    private BitmapFont menuFont;
 
     // INTRODUÇÃO
     private Texture[] framesAviao;
@@ -184,9 +192,14 @@ public class Main implements ApplicationListener {
         px = 20.5f;
         py = 10.5f;
 
-        font = new BitmapFont();
-        font.getData().setScale(0.5f);
+        gameFont = new BitmapFont();
+        gameFont.getData().setScale(0.02f);
 
+        menuFont = new BitmapFont();
+        menuFont.getData().setScale(1.0f);
+        
+        cardMenuIniciarTexture = new Texture("card_menuiniciar.png");
+        cardSelecaoTexture = new Texture("card_selecao.png");
         arvoreTexture = new Texture("arvore.png");
         arvoreTroncoTexture = new Texture("arvoreTronco.png");
         madeiraTexture = new Texture("madeira.png");
@@ -265,7 +278,7 @@ public class Main implements ApplicationListener {
             regioes[i - 1] = new TextureRegion(framesAviao[i - 1]);
         }
 
-        animacaoAviao = new Animation<>(0.08f, regioes);
+        animacaoAviao = new Animation<>(0.06f, regioes);
     }
 
     @Override
@@ -282,6 +295,10 @@ public class Main implements ApplicationListener {
    
             case INTRODUCAO:
                 renderIntroducao();
+                break;
+
+            case MENU_INICIAR:
+                renderMenuIniciar();
                 break;
 
             case SELECAO:
@@ -319,7 +336,7 @@ public class Main implements ApplicationListener {
                 (altura - h) / 2f
         );
 
-        font.draw(spriteBatch,
+        gameFont.draw(spriteBatch,
             "ESPACO para pular",
                20,
                40);
@@ -327,13 +344,56 @@ public class Main implements ApplicationListener {
         spriteBatch.end();
 
         if(Gdx.input.isKeyJustPressed(Keys.SPACE)) {
-            estadoAtual = EstadoJogo.SELECAO;
+            estadoAtual = EstadoJogo.MENU_INICIAR;
         }
 
         if(animacaoAviao.isAnimationFinished(tempoIntroducao)) {
+            estadoAtual = EstadoJogo.MENU_INICIAR;
+        }
+    }
+
+    private void renderMenuIniciar() {
+
+        ScreenUtils.clear(Color.BLACK);
+
+        spriteBatch.begin();
+
+        float screenW = Gdx.graphics.getWidth();
+        float screenH = Gdx.graphics.getHeight();
+
+        spriteBatch.draw(
+            cardMenuIniciarTexture,
+          0,
+          0,
+            screenW,
+            screenH
+        );
+
+        spriteBatch.end();
+
+        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
             estadoAtual = EstadoJogo.SELECAO;
         }
-}
+
+        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+
+            float mx = Gdx.input.getX();
+            float my = screenH - Gdx.input.getY();
+
+            float botaoX = screenW * 0.38f;
+            float botaoY = screenH * 0.28f;
+            float botaoW = screenW * 0.24f;
+            float botaoH = screenH * 0.08f;
+
+            if(mx >= botaoX &&
+                mx <= botaoX + botaoW &&
+                my >= botaoY &&
+                my <= botaoY + botaoH) {
+
+               estadoAtual = EstadoJogo.SELECAO;
+            }
+        }
+    }
 
     private void renderSelecao() {
 
@@ -341,91 +401,138 @@ public class Main implements ApplicationListener {
 
         ScreenUtils.clear(Color.DARK_GRAY);
 
+        float screenW = Gdx.graphics.getWidth();
+        float screenH = Gdx.graphics.getHeight();
+
         spriteBatch.begin();
 
-        float y = 11f;
+        spriteBatch.draw(
+        cardSelecaoTexture,
+        0,
+        0,
+        screenW,
+        screenH
+    );
 
-        font.draw(spriteBatch,
-        "O aviao caiu em uma regiao remota e isolada.",
-           1f,
-              y);
+    float primeiraLinhaY = screenH * 0.53f;
+    float espacamentoY = screenH * 0.060f;
 
-        y -= 1f;
+    float indicadorX = screenW * 0.172f;
 
-        font.draw(spriteBatch,
-        "Escolha exatamente 5 sobreviventes.",
-           1f, y);
+    float checkboxX = screenW * 0.440f;
 
-        y -= 1f;
+    menuFont.setColor(Color.GOLD);
 
-        font.draw(spriteBatch,
-        "Dica: Escolha habilidades importantes para sobreviver.",
-           1f, y);
+    // indicador atual
+    float indicadorY =
+        primeiraLinhaY -
+        (indiceSelecionado * espacamentoY);
 
-        y -= 2f;
+    menuFont.draw(
+        spriteBatch,
+        ">",
+        indicadorX,
+        indicadorY
+    );
 
-        for(int i = 0; i < sobreviventesDisponiveis.size(); i++) {
+    // checkboxes
+    for(int i = 0; i < sobreviventesDisponiveis.size(); i++) {
 
-            Personagem p = sobreviventesDisponiveis.get(i);
+        Personagem p = sobreviventesDisponiveis.get(i);
 
-            String texto =
-                p.getNome()
-                + " - "
-                + p.getHabilidade();
+        if(sobreviventesSelecionados.contains(p)) {
 
-            if(i == indiceSelecionado)
-                texto = "> " + texto;
+            float y =
+                primeiraLinhaY -
+                (i * espacamentoY)  + (menuFont.getCapHeight() * 0.35f);
 
-            if(sobreviventesSelecionados.contains(p))
-                texto += " [SELECIONADO]";
-
-            font.draw(spriteBatch, texto, 1f, y);
-
-            y -= 0.8f;
+            menuFont.draw(
+                spriteBatch,
+                "X",
+                checkboxX,
+                y
+            );
         }
-
-        font.draw(spriteBatch,
-            "Selecionados: " + sobreviventesSelecionados.size()
-            + "/5",1f,1f);
-
-        spriteBatch.end();
     }
+
+    // slots da direita
+    float slotX = screenW * 0.58f;
+    float slotY = screenH * 0.69f;
+    float espacamentoSlots = screenH * 0.095f;
+
+    for(int i = 0; i < sobreviventesSelecionados.size(); i++) {
+
+        Personagem p =
+            sobreviventesSelecionados.get(i);
+
+        menuFont.draw(
+            spriteBatch,
+            p.getNome() +
+            " - " +
+            p.getHabilidade(),
+            slotX,
+            slotY - (i * espacamentoSlots)
+        );
+    }
+
+    menuFont.draw(
+        spriteBatch,
+        "Selecionados: "
+            + sobreviventesSelecionados.size()
+            + " / 5",
+        screenW * 0.58f,
+        screenH * 0.045f
+    );
+
+    menuFont.setColor(Color.WHITE);
+
+    spriteBatch.end();
+}
+    
 
     private void atualizarSelecao() {
 
-        if(Gdx.input.isKeyJustPressed(Keys.DOWN) ||
-            Gdx.input.isKeyJustPressed(Keys.S)) {
+    if(Gdx.input.isKeyJustPressed(Keys.DOWN)
+       || Gdx.input.isKeyJustPressed(Keys.S)) {
 
-            indiceSelecionado++;
+        indiceSelecionado++;
 
-            if(indiceSelecionado >= sobreviventesDisponiveis.size())
-                indiceSelecionado = 0;
-        }
+        if(indiceSelecionado >= sobreviventesDisponiveis.size())
+            indiceSelecionado = 0;
+    }
 
-        if(Gdx.input.isKeyJustPressed(Keys.UP) ||
-            Gdx.input.isKeyJustPressed(Keys.W)) {
+    if(Gdx.input.isKeyJustPressed(Keys.UP)
+       || Gdx.input.isKeyJustPressed(Keys.W)) {
 
-            indiceSelecionado--;
+        indiceSelecionado--;
 
-            if(indiceSelecionado < 0)
-                indiceSelecionado =
-                    sobreviventesDisponiveis.size() - 1;
-        }
+        if(indiceSelecionado < 0)
+            indiceSelecionado =
+                sobreviventesDisponiveis.size() - 1;
+    }
 
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+    if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
 
-            Personagem escolhido =
-                sobreviventesDisponiveis.get(indiceSelecionado);
+        Personagem escolhido =
+            sobreviventesDisponiveis.get(indiceSelecionado);
 
-            if(!sobreviventesSelecionados.contains(escolhido)) {
+        if(sobreviventesSelecionados.contains(escolhido)) {
+
+            sobreviventesSelecionados.remove(escolhido);
+
+        } else {
+
+            if(sobreviventesSelecionados.size() < 5) {
 
                 sobreviventesSelecionados.add(escolhido);
-
-                if(sobreviventesSelecionados.size() == 5) {
-                    finalizarSelecao();
-                }
             }
         }
+
+        if(sobreviventesSelecionados.size() == 5) {
+
+            finalizarSelecao();
+        }
+    }
 }
 
     private void finalizarSelecao() {
@@ -901,6 +1008,8 @@ public class Main implements ApplicationListener {
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
 
+        gameFont.getData().setScale(0.02f);
+
         // trava a camera
         float viewportHalfWidth = camera.viewportWidth / 2f;
         float viewportHalfHeight = camera.viewportHeight / 2f;
@@ -1021,6 +1130,21 @@ public class Main implements ApplicationListener {
         }
 
         spriteBatch.draw(texturaAtual, px, py, playerSize, playerSize);
+        
+        if (personagemAtual != null) {
+
+            String texto = personagemAtual.getHabilidade();
+
+            float textoX = px - 0.03f;
+            float textoY = py + playerSize + 0.3f;
+
+            gameFont.draw(
+                spriteBatch,
+                texto,
+                textoX,
+                textoY
+            );
+        }
 
         if (carregandoAgua) {
             spriteBatch.draw(baldeCheioTexture, px + 0.6f, py + 0.1f, 0.7f, 0.7f);
@@ -1032,8 +1156,9 @@ public class Main implements ApplicationListener {
         }
 
         if (mensagemTimer > 0)
-            font.draw(spriteBatch, mensagem, camera.position.x - 5, camera.position.y + 4);
-        font.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 4);
+            gameFont.draw(spriteBatch, mensagem, camera.position.x - 5, camera.position.y + 4);
+
+        gameFont.draw(spriteBatch, "Peixes: " + peixesColetados, camera.position.x - 9, camera.position.y + 5.2f);
 
         spriteBatch.end();
     }
@@ -1050,7 +1175,8 @@ public class Main implements ApplicationListener {
     public void dispose() {
         spriteBatch.dispose();
         shapeRenderer.dispose();
-        font.dispose();
+        gameFont.dispose();
+        menuFont.dispose();
         arvoreTexture.dispose();
         arvoreTroncoTexture.dispose();
         madeiraTexture.dispose();
@@ -1072,6 +1198,8 @@ public class Main implements ApplicationListener {
         cestaTexture.dispose();
         frutoTexture.dispose();
         curaTexture.dispose();
+        cardMenuIniciarTexture.dispose();
+        cardSelecaoTexture.dispose();
 
         for(Texture t : framesAviao) {
             if(t != null)
