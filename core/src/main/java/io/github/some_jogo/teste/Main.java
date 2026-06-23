@@ -397,9 +397,10 @@ public class Main implements ApplicationListener {
         }
     }
 
+
 private void renderSelecao() {
 
-    atualizarSelecao();
+    atualizarSelecaoPorNumero();
 
     ScreenUtils.clear(Color.BLACK);
 
@@ -417,14 +418,6 @@ private void renderSelecao() {
     );
 
     menuFont.setColor(Color.GOLD);
-
-    // Campo digitado
-    menuFont.draw(
-        spriteBatch,
-        "Digite um numero (1-10): " + numeroDigitado,
-        screenW * 0.57f,
-        screenH * 0.32f
-    );
 
     // Área da direita
     float slotX = screenW * 0.63f;
@@ -445,89 +438,77 @@ private void renderSelecao() {
 
     spriteBatch.end();
 }
-    
-private void atualizarSelecao() {
 
-    // Digitos 0-9
-    for(int i = 0; i <= 9; i++) {
+private void atualizarSelecaoPorNumero() {
 
-        int key;
+    // Captura números digitados
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_0))
+        numeroDigitado += "0";
 
-        switch(i) {
-            case 0: key = Keys.NUM_0; break;
-            case 1: key = Keys.NUM_1; break;
-            case 2: key = Keys.NUM_2; break;
-            case 3: key = Keys.NUM_3; break;
-            case 4: key = Keys.NUM_4; break;
-            case 5: key = Keys.NUM_5; break;
-            case 6: key = Keys.NUM_6; break;
-            case 7: key = Keys.NUM_7; break;
-            case 8: key = Keys.NUM_8; break;
-            default: key = Keys.NUM_9;
-        }
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_1))
+        numeroDigitado += "1";
 
-        if(Gdx.input.isKeyJustPressed(key)) {
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_2))
+        numeroDigitado += "2";
 
-            if(numeroDigitado.length() < 2) {
-                numeroDigitado += i;
-            }
-        }
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_3))
+        numeroDigitado += "3";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_4))
+        numeroDigitado += "4";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_5))
+        numeroDigitado += "5";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_6))
+        numeroDigitado += "6";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_7))
+        numeroDigitado += "7";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_8))
+        numeroDigitado += "8";
+
+    if (Gdx.input.isKeyJustPressed(Keys.NUM_9))
+        numeroDigitado += "9";
+
+    // Remove último dígito
+    if (Gdx.input.isKeyJustPressed(Keys.DEL)
+            && numeroDigitado.length() > 0) {
+
+        numeroDigitado =
+            numeroDigitado.substring(
+                0,
+                numeroDigitado.length() - 1
+            );
     }
 
-    // Backspace
-    if(Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
+    // ENTER confirma
+    if (Gdx.input.isKeyJustPressed(Keys.ENTER)
+            && !numeroDigitado.isEmpty()) {
 
-        if(numeroDigitado.length() > 0) {
+        int numero = Integer.parseInt(numeroDigitado);
 
-            numeroDigitado =
-                numeroDigitado.substring(
-                    0,
-                    numeroDigitado.length() - 1
-                );
-        }
-    }
+        if (numero >= 1
+                && numero <= 10
+                && numerosSelecionados.size() < 5
+                && !numerosSelecionados.contains(numero)) {
 
-    // ENTER
-    if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-
-        if(numeroDigitado.isEmpty())
-            return;
-
-        int numero =
-            Integer.parseInt(numeroDigitado);
-
-        if(numero >= 1 &&
-           numero <= sobreviventesDisponiveis.size()) {
+            numerosSelecionados.add(numero);
 
             Personagem p =
                 sobreviventesDisponiveis.get(numero - 1);
 
-            if(!sobreviventesSelecionados.contains(p)
-                    && sobreviventesSelecionados.size() < 5) {
+            sobreviventesSelecionados.add(p);
 
-                sobreviventesSelecionados.add(p);
-                numerosSelecionados.add(numero);
+            if (sobreviventesSelecionados.size() == 5) {
+                finalizarSelecao();
             }
         }
 
         numeroDigitado = "";
-
-        if(sobreviventesSelecionados.size() == 5) {
-
-            finalizarSelecao();
-        }
     }
-    if(Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
-
-    if(!sobreviventesSelecionados.isEmpty()) {
-
-        int ultimo =
-            sobreviventesSelecionados.size() - 1;
-
-        sobreviventesSelecionados.remove(ultimo);
-        numerosSelecionados.remove(ultimo);
-    }
-}
+    
 }
 
     private void finalizarSelecao() {
