@@ -83,7 +83,8 @@ public class Main implements ApplicationListener {
 
     // SELEÇÃO
     private ArrayList<Personagem> sobreviventesSelecionados;
-    private int indiceSelecionado = 0;
+    private String numeroDigitado = "";
+    private ArrayList<Integer> numerosSelecionados;
 
     SpriteBatch spriteBatch;
     ShapeRenderer shapeRenderer;
@@ -196,7 +197,7 @@ public class Main implements ApplicationListener {
         gameFont.getData().setScale(0.02f);
 
         menuFont = new BitmapFont();
-        menuFont.getData().setScale(1.0f);
+        menuFont.getData().setScale(0.90f);
         
         cardMenuIniciarTexture = new Texture("card_menuiniciar.png");
         cardSelecaoTexture = new Texture("card_selecao.png");
@@ -225,6 +226,7 @@ public class Main implements ApplicationListener {
 
         grupo = new Grupo();
         sobreviventesDisponiveis = new ArrayList<>();
+        numerosSelecionados = new ArrayList<>();
 
         Personagem joao = new Personagem("Joao", "Pesca");
         Personagem ana = new Personagem("Ana", "Cura");
@@ -395,18 +397,18 @@ public class Main implements ApplicationListener {
         }
     }
 
-    private void renderSelecao() {
+private void renderSelecao() {
 
-        atualizarSelecao();
+    atualizarSelecao();
 
-        ScreenUtils.clear(Color.DARK_GRAY);
+    ScreenUtils.clear(Color.BLACK);
 
-        float screenW = Gdx.graphics.getWidth();
-        float screenH = Gdx.graphics.getHeight();
+    float screenW = Gdx.graphics.getWidth();
+    float screenH = Gdx.graphics.getHeight();
 
-        spriteBatch.begin();
+    spriteBatch.begin();
 
-        spriteBatch.draw(
+    spriteBatch.draw(
         cardSelecaoTexture,
         0,
         0,
@@ -414,125 +416,118 @@ public class Main implements ApplicationListener {
         screenH
     );
 
-    float primeiraLinhaY = screenH * 0.53f;
-    float espacamentoY = screenH * 0.060f;
-
-    float indicadorX = screenW * 0.172f;
-
-    float checkboxX = screenW * 0.440f;
-
     menuFont.setColor(Color.GOLD);
 
-    // indicador atual
-    float indicadorY =
-        primeiraLinhaY -
-        (indiceSelecionado * espacamentoY);
-
+    // Campo digitado
     menuFont.draw(
         spriteBatch,
-        ">",
-        indicadorX,
-        indicadorY
+        "Digite um numero (1-10): " + numeroDigitado,
+        screenW * 0.57f,
+        screenH * 0.32f
     );
 
-    // checkboxes
-    for(int i = 0; i < sobreviventesDisponiveis.size(); i++) {
+    // Área da direita
+    float slotX = screenW * 0.63f;
+    float slotY = screenH * 0.63f;
+    float espacamento = screenH * 0.08f;
 
-        Personagem p = sobreviventesDisponiveis.get(i);
-
-        if(sobreviventesSelecionados.contains(p)) {
-
-            float y =
-                primeiraLinhaY -
-                (i * espacamentoY)  + (menuFont.getCapHeight() * 0.35f);
-
-            menuFont.draw(
-                spriteBatch,
-                "X",
-                checkboxX,
-                y
-            );
-        }
-    }
-
-    // slots da direita
-    float slotX = screenW * 0.58f;
-    float slotY = screenH * 0.69f;
-    float espacamentoSlots = screenH * 0.095f;
-
-    for(int i = 0; i < sobreviventesSelecionados.size(); i++) {
-
-        Personagem p =
-            sobreviventesSelecionados.get(i);
+    for(int i = 0; i < numerosSelecionados.size(); i++) {
 
         menuFont.draw(
             spriteBatch,
-            p.getNome() +
-            " - " +
-            p.getHabilidade(),
+            String.valueOf(
+                numerosSelecionados.get(i)
+            ),
             slotX,
-            slotY - (i * espacamentoSlots)
+            slotY - (i * espacamento)
         );
     }
-
-    menuFont.draw(
-        spriteBatch,
-        "Selecionados: "
-            + sobreviventesSelecionados.size()
-            + " / 5",
-        screenW * 0.58f,
-        screenH * 0.045f
-    );
-
-    menuFont.setColor(Color.WHITE);
 
     spriteBatch.end();
 }
     
+private void atualizarSelecao() {
 
-    private void atualizarSelecao() {
+    // Digitos 0-9
+    for(int i = 0; i <= 9; i++) {
 
-    if(Gdx.input.isKeyJustPressed(Keys.DOWN)
-       || Gdx.input.isKeyJustPressed(Keys.S)) {
+        int key;
 
-        indiceSelecionado++;
+        switch(i) {
+            case 0: key = Keys.NUM_0; break;
+            case 1: key = Keys.NUM_1; break;
+            case 2: key = Keys.NUM_2; break;
+            case 3: key = Keys.NUM_3; break;
+            case 4: key = Keys.NUM_4; break;
+            case 5: key = Keys.NUM_5; break;
+            case 6: key = Keys.NUM_6; break;
+            case 7: key = Keys.NUM_7; break;
+            case 8: key = Keys.NUM_8; break;
+            default: key = Keys.NUM_9;
+        }
 
-        if(indiceSelecionado >= sobreviventesDisponiveis.size())
-            indiceSelecionado = 0;
-    }
+        if(Gdx.input.isKeyJustPressed(key)) {
 
-    if(Gdx.input.isKeyJustPressed(Keys.UP)
-       || Gdx.input.isKeyJustPressed(Keys.W)) {
-
-        indiceSelecionado--;
-
-        if(indiceSelecionado < 0)
-            indiceSelecionado =
-                sobreviventesDisponiveis.size() - 1;
-    }
-
-    if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-
-        Personagem escolhido =
-            sobreviventesDisponiveis.get(indiceSelecionado);
-
-        if(sobreviventesSelecionados.contains(escolhido)) {
-
-            sobreviventesSelecionados.remove(escolhido);
-
-        } else {
-
-            if(sobreviventesSelecionados.size() < 5) {
-
-                sobreviventesSelecionados.add(escolhido);
+            if(numeroDigitado.length() < 2) {
+                numeroDigitado += i;
             }
         }
+    }
+
+    // Backspace
+    if(Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
+
+        if(numeroDigitado.length() > 0) {
+
+            numeroDigitado =
+                numeroDigitado.substring(
+                    0,
+                    numeroDigitado.length() - 1
+                );
+        }
+    }
+
+    // ENTER
+    if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+
+        if(numeroDigitado.isEmpty())
+            return;
+
+        int numero =
+            Integer.parseInt(numeroDigitado);
+
+        if(numero >= 1 &&
+           numero <= sobreviventesDisponiveis.size()) {
+
+            Personagem p =
+                sobreviventesDisponiveis.get(numero - 1);
+
+            if(!sobreviventesSelecionados.contains(p)
+                    && sobreviventesSelecionados.size() < 5) {
+
+                sobreviventesSelecionados.add(p);
+                numerosSelecionados.add(numero);
+            }
+        }
+
+        numeroDigitado = "";
 
         if(sobreviventesSelecionados.size() == 5) {
 
             finalizarSelecao();
         }
     }
+    if(Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
+
+    if(!sobreviventesSelecionados.isEmpty()) {
+
+        int ultimo =
+            sobreviventesSelecionados.size() - 1;
+
+        sobreviventesSelecionados.remove(ultimo);
+        numerosSelecionados.remove(ultimo);
+    }
+}
 }
 
     private void finalizarSelecao() {
@@ -1135,8 +1130,8 @@ public class Main implements ApplicationListener {
 
             String texto = personagemAtual.getHabilidade();
 
-            float textoX = px - 0.03f;
-            float textoY = py + playerSize + 0.3f;
+            float textoX = px - 0.08f;
+            float textoY = py + playerSize + 0.5f;
 
             gameFont.draw(
                 spriteBatch,
