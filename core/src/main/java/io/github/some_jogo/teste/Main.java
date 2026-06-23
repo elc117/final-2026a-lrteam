@@ -66,6 +66,11 @@ public class Main implements ApplicationListener {
     Texture playerTresTexture;
     Texture playerQuatroTexture;
     Texture playerCincoTexture;
+    Texture playerSeisTexture;
+    Texture playerSeteTexture;
+    Texture playerOitoTexture;
+    Texture playerNoveTexture;
+    Texture playerDezTexture;
 
     Animation<TextureRegion> walkDown, walkUp, walkLeft, walkRight;
     TextureRegion idleFrame;
@@ -198,7 +203,7 @@ public class Main implements ApplicationListener {
 
         menuFont = new BitmapFont();
         menuFont.getData().setScale(0.90f);
-        
+
         cardMenuIniciarTexture = new Texture("card_menuiniciar.png");
         cardSelecaoTexture = new Texture("card_selecao.png");
         arvoreTexture = new Texture("arvore.png");
@@ -252,6 +257,11 @@ public class Main implements ApplicationListener {
         playerTresTexture = new Texture("personagem3.png");
         playerQuatroTexture = new Texture("personagem4.png");
         playerCincoTexture = new Texture("personagem5.png");
+        playerSeisTexture = new Texture("personagem6.png");
+        playerSeteTexture = new Texture("personagem7.png");
+        playerOitoTexture = new Texture("personagem8.png");
+        playerNoveTexture = new Texture("personagem9.png");
+        playerDezTexture = new Texture("personagem10.png");
 
         sobreviventesDisponiveis.add(joao);
         sobreviventesDisponiveis.add(ana);
@@ -269,12 +279,10 @@ public class Main implements ApplicationListener {
         framesAviao = new Texture[51];
         TextureRegion[] regioes = new TextureRegion[51];
 
-        for(int i = 1; i <= 51; i++) {
+        for (int i = 1; i <= 51; i++) {
 
-            String arquivo =
-                String.format(
-            "frames-aviao/ezgif-frame-%03d.png", i
-            );
+            String arquivo = String.format(
+                    "frames-aviao/ezgif-frame-%03d.png", i);
 
             framesAviao[i - 1] = new Texture(arquivo);
             regioes[i - 1] = new TextureRegion(framesAviao[i - 1]);
@@ -293,8 +301,8 @@ public class Main implements ApplicationListener {
     @Override
     public void render() {
 
-        switch(estadoAtual) {
-   
+        switch (estadoAtual) {
+
             case INTRODUCAO:
                 renderIntroducao();
                 break;
@@ -312,17 +320,16 @@ public class Main implements ApplicationListener {
                 logic();
                 draw();
                 break;
+        }
     }
-}
-    
+
     private void renderIntroducao() {
 
         ScreenUtils.clear(Color.BLACK);
 
         tempoIntroducao += Gdx.graphics.getDeltaTime();
 
-        TextureRegion frameAtual =
-            animacaoAviao.getKeyFrame(tempoIntroducao);
+        TextureRegion frameAtual = animacaoAviao.getKeyFrame(tempoIntroducao);
 
         spriteBatch.begin();
 
@@ -335,21 +342,20 @@ public class Main implements ApplicationListener {
         spriteBatch.draw(
                 frameAtual,
                 (largura - w) / 2f,
-                (altura - h) / 2f
-        );
+                (altura - h) / 2f);
 
         gameFont.draw(spriteBatch,
-            "ESPACO para pular",
-               20,
-               40);
+                "ESPACO para pular",
+                20,
+                40);
 
         spriteBatch.end();
 
-        if(Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
             estadoAtual = EstadoJogo.MENU_INICIAR;
         }
 
-        if(animacaoAviao.isAnimationFinished(tempoIntroducao)) {
+        if (animacaoAviao.isAnimationFinished(tempoIntroducao)) {
             estadoAtual = EstadoJogo.MENU_INICIAR;
         }
     }
@@ -364,20 +370,19 @@ public class Main implements ApplicationListener {
         float screenH = Gdx.graphics.getHeight();
 
         spriteBatch.draw(
-            cardMenuIniciarTexture,
-          0,
-          0,
-            screenW,
-            screenH
-        );
+                cardMenuIniciarTexture,
+                0,
+                0,
+                screenW,
+                screenH);
 
         spriteBatch.end();
 
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+        if (Gdx.input.isKeyJustPressed(Keys.ENTER)) {
             estadoAtual = EstadoJogo.SELECAO;
         }
 
-        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
 
             float mx = Gdx.input.getX();
             float my = screenH - Gdx.input.getY();
@@ -387,165 +392,158 @@ public class Main implements ApplicationListener {
             float botaoW = screenW * 0.24f;
             float botaoH = screenH * 0.08f;
 
-            if(mx >= botaoX &&
-                mx <= botaoX + botaoW &&
-                my >= botaoY &&
-                my <= botaoY + botaoH) {
+            if (mx >= botaoX &&
+                    mx <= botaoX + botaoW &&
+                    my >= botaoY &&
+                    my <= botaoY + botaoH) {
 
-               estadoAtual = EstadoJogo.SELECAO;
+                estadoAtual = EstadoJogo.SELECAO;
             }
         }
     }
 
+    private void renderSelecao() {
 
-private void renderSelecao() {
+        atualizarSelecaoPorNumero();
 
-    atualizarSelecaoPorNumero();
+        ScreenUtils.clear(Color.BLACK);
 
-    ScreenUtils.clear(Color.BLACK);
+        float screenW = Gdx.graphics.getWidth();
+        float screenH = Gdx.graphics.getHeight();
 
-    float screenW = Gdx.graphics.getWidth();
-    float screenH = Gdx.graphics.getHeight();
+        spriteBatch.begin();
 
-    spriteBatch.begin();
-
-    spriteBatch.draw(
-        cardSelecaoTexture,
-        0,
-        0,
-        screenW,
-        screenH
-    );
-
-    menuFont.setColor(Color.GOLD);
-
-    // Área da direita
-    float slotX = screenW * 0.63f;
-    float slotY = screenH * 0.63f;
-    float espacamento = screenH * 0.08f;
-
-    for(int i = 0; i < numerosSelecionados.size(); i++) {
-
-        menuFont.draw(
-            spriteBatch,
-            String.valueOf(
-                numerosSelecionados.get(i)
-            ),
-            slotX,
-            slotY - (i * espacamento)
-        );
-    }
-
-    spriteBatch.end();
-}
-
-private void atualizarSelecaoPorNumero() {
-
-    // Captura números digitados
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_0))
-        numeroDigitado += "0";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_1))
-        numeroDigitado += "1";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_2))
-        numeroDigitado += "2";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_3))
-        numeroDigitado += "3";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_4))
-        numeroDigitado += "4";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_5))
-        numeroDigitado += "5";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_6))
-        numeroDigitado += "6";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_7))
-        numeroDigitado += "7";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_8))
-        numeroDigitado += "8";
-
-    if (Gdx.input.isKeyJustPressed(Keys.NUM_9))
-        numeroDigitado += "9";
-
-    // Remove último dígito
-    if (Gdx.input.isKeyJustPressed(Keys.DEL)
-            && numeroDigitado.length() > 0) {
-
-        numeroDigitado =
-            numeroDigitado.substring(
+        spriteBatch.draw(
+                cardSelecaoTexture,
                 0,
-                numeroDigitado.length() - 1
-            );
-    }
+                0,
+                screenW,
+                screenH);
 
-    // ENTER confirma
-    if (Gdx.input.isKeyJustPressed(Keys.ENTER)
-            && !numeroDigitado.isEmpty()) {
+        menuFont.setColor(Color.GOLD);
 
-        int numero = Integer.parseInt(numeroDigitado);
+        // Área da direita
+        float slotX = screenW * 0.63f;
+        float slotY = screenH * 0.63f;
+        float espacamento = screenH * 0.08f;
 
-        if (numero >= 1
-                && numero <= 10
-                && numerosSelecionados.size() < 5
-                && !numerosSelecionados.contains(numero)) {
+        for (int i = 0; i < numerosSelecionados.size(); i++) {
 
-            numerosSelecionados.add(numero);
-
-            Personagem p =
-                sobreviventesDisponiveis.get(numero - 1);
-
-            sobreviventesSelecionados.add(p);
-
-            if (sobreviventesSelecionados.size() == 5) {
-                finalizarSelecao();
-            }
+            menuFont.draw(
+                    spriteBatch,
+                    String.valueOf(
+                            numerosSelecionados.get(i)),
+                    slotX,
+                    slotY - (i * espacamento));
         }
 
-        numeroDigitado = "";
+        spriteBatch.end();
     }
-    
-}
+
+    private void atualizarSelecaoPorNumero() {
+
+        // Captura números digitados
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_0))
+            numeroDigitado += "0";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_1))
+            numeroDigitado += "1";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_2))
+            numeroDigitado += "2";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_3))
+            numeroDigitado += "3";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_4))
+            numeroDigitado += "4";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_5))
+            numeroDigitado += "5";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_6))
+            numeroDigitado += "6";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_7))
+            numeroDigitado += "7";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_8))
+            numeroDigitado += "8";
+
+        if (Gdx.input.isKeyJustPressed(Keys.NUM_9))
+            numeroDigitado += "9";
+
+        // Remove último dígito
+        if (Gdx.input.isKeyJustPressed(Keys.DEL)
+                && numeroDigitado.length() > 0) {
+
+            numeroDigitado = numeroDigitado.substring(
+                    0,
+                    numeroDigitado.length() - 1);
+        }
+
+        // ENTER confirma
+        if (Gdx.input.isKeyJustPressed(Keys.ENTER)
+                && !numeroDigitado.isEmpty()) {
+
+            int numero = Integer.parseInt(numeroDigitado);
+
+            if (numero >= 1
+                    && numero <= 10
+                    && numerosSelecionados.size() < 5
+                    && !numerosSelecionados.contains(numero)) {
+
+                numerosSelecionados.add(numero);
+
+                Personagem p = sobreviventesDisponiveis.get(numero - 1);
+
+                sobreviventesSelecionados.add(p);
+
+                if (sobreviventesSelecionados.size() == 5) {
+                    finalizarSelecao();
+                }
+            }
+
+            numeroDigitado = "";
+        }
+
+    }
 
     private void finalizarSelecao() {
 
         grupo = new Grupo();
 
-        for(Personagem p : sobreviventesSelecionados) {
+        for (Personagem p : sobreviventesSelecionados) {
 
             grupo.adicionar(p);
 
-            switch(p.getHabilidade()) {
+            switch (p.getHabilidade()) {
 
-                    case "Agua":
-                        personagemAgua = p;
-                        break;
+                case "Agua":
+                    personagemAgua = p;
+                    break;
 
-                    case "Fogo":
-                        personagemFogo = p;
-                        break;
+                case "Fogo":
+                    personagemFogo = p;
+                    break;
 
-                    case "Pesca":
-                        personagemPesca = p;
-                        break;
+                case "Pesca":
+                    personagemPesca = p;
+                    break;
 
-                    case "Construcao":
-                        personagemConstrucao = p;
-                        break;
+                case "Construcao":
+                    personagemConstrucao = p;
+                    break;
 
-                    case "Cura":
-                        personagemCura = p;
-                        break;
+                case "Cura":
+                    personagemCura = p;
+                    break;
+            }
         }
-    }
         personagemAtual = sobreviventesSelecionados.get(0);
 
         estadoAtual = EstadoJogo.JOGANDO;
-}
+    }
 
     private void input() {
         float speed = 3f;
@@ -600,38 +598,25 @@ private void atualizarSelecaoPorNumero() {
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.NUM_1)) {
-            if(personagemAgua != null)
-                personagemAtual = personagemAgua;
-        else
-            mostrarMensagem("Nenhum sobrevivente possui a habilidade Agua!");
+            trocarPersonagem(0);
         }
-
         if (Gdx.input.isKeyJustPressed(Keys.NUM_2)) {
-            if(personagemFogo != null)
-                personagemAtual = personagemFogo;
-            else
-            mostrarMensagem("Nenhum sobrevivente possui a habilidade Fogo!");
+            trocarPersonagem(1);
         }
-
         if (Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
-            if(personagemPesca != null)
-                personagemAtual = personagemPesca;
-            else
-                mostrarMensagem("Nenhum sobrevivente possui a habilidade Pesca!");
+            trocarPersonagem(2);
         }
-
         if (Gdx.input.isKeyJustPressed(Keys.NUM_4)) {
-            if(personagemConstrucao != null)
-                personagemAtual = personagemConstrucao;
-            else
-                mostrarMensagem("Nenhum sobrevivente possui a habilidade Construcao!");
+            trocarPersonagem(3);
         }
-
         if (Gdx.input.isKeyJustPressed(Keys.NUM_5)) {
-            if(personagemCura != null)
-                personagemAtual = personagemCura;
-            else
-                mostrarMensagem("Nenhum sobrevivente possui a habilidade Cura!");
+            trocarPersonagem(4);
+        }
+    }
+
+    private void trocarPersonagem(int index) {
+        if (index < sobreviventesSelecionados.size()) {
+            personagemAtual = sobreviventesSelecionados.get(index);
         }
     }
 
@@ -649,6 +634,12 @@ private void atualizarSelecaoPorNumero() {
     }
 
     private void interagir() {
+
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
         if (mapaAtual == 1) {
 
             // arvore pedro
@@ -707,7 +698,12 @@ private void atualizarSelecaoPorNumero() {
 
     private void montarFogueira() {
 
-        if(personagemFogo == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemFogo == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Fogo!");
             return;
         }
@@ -737,9 +733,14 @@ private void atualizarSelecaoPorNumero() {
 
     private void acenderFogueira() {
 
-        if(personagemFogo == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemFogo == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Fogo!");
-           return;
+            return;
         }
 
         if (!personagemAtual.getHabilidade().equals("Fogo")) {
@@ -785,7 +786,12 @@ private void atualizarSelecaoPorNumero() {
 
     private void montarAbrigo() {
 
-        if(personagemConstrucao == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemConstrucao == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Construcao!");
             return;
         }
@@ -813,7 +819,12 @@ private void atualizarSelecaoPorNumero() {
 
     private void pescar() {
 
-        if(personagemPesca == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemPesca == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Pesca!");
             return;
         }
@@ -871,6 +882,12 @@ private void atualizarSelecaoPorNumero() {
     }
 
     private void coletarFrutos() {
+
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
         if (!personagemAtual.getHabilidade().equals("Cura")) {
             mostrarMensagem("Somente Ana pode coletar frutos!");
             return;
@@ -920,7 +937,12 @@ private void atualizarSelecaoPorNumero() {
 
     private void criarCura() {
 
-        if(personagemCura == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemCura == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Cura!");
             return;
         }
@@ -952,7 +974,12 @@ private void atualizarSelecaoPorNumero() {
 
     private void entregarAgua() {
 
-        if(personagemAgua == null) {
+        if (!personagemValido(personagemAtual)) {
+            mostrarMensagem("Esse personagem nao sabe realizar tarefas!");
+            return;
+        }
+
+        if (personagemAgua == null) {
             mostrarMensagem("Seu grupo nao possui especialista em Agua!");
             return;
         }
@@ -979,6 +1006,48 @@ private void atualizarSelecaoPorNumero() {
         baldeCheio = false;
 
         mostrarMensagem("Agua entregue!");
+    }
+
+    private Texture getTextureDoPersonagem(Personagem p) {
+
+        if (p == null)
+            return playerUmTexture;
+
+        String nome = p.getNome();
+
+        if (nome.equalsIgnoreCase("Joao"))
+            return playerUmTexture;
+        if (nome.equalsIgnoreCase("Ana"))
+            return playerDoisTexture;
+        if (nome.equalsIgnoreCase("Pedro"))
+            return playerTresTexture;
+        if (nome.equalsIgnoreCase("Leo"))
+            return playerQuatroTexture;
+        if (nome.equalsIgnoreCase("Felipe"))
+            return playerCincoTexture;
+
+        if (nome.equalsIgnoreCase("Cintia"))
+            return playerSeisTexture;
+        if (nome.equalsIgnoreCase("Rita"))
+            return playerSeteTexture;
+        if (nome.equalsIgnoreCase("Anita"))
+            return playerOitoTexture;
+        if (nome.equalsIgnoreCase("Bruno"))
+            return playerNoveTexture;
+        if (nome.equalsIgnoreCase("Marina"))
+            return playerDezTexture;
+
+        return playerUmTexture;
+    }
+
+    private boolean personagemValido(Personagem p) {
+        String nome = p.getNome();
+
+        return nome.equals("Joao") ||
+                nome.equals("Ana") ||
+                nome.equals("Pedro") ||
+                nome.equals("Leo") ||
+                nome.equals("Felipe");
     }
 
     private void draw() {
@@ -1089,24 +1158,9 @@ private void atualizarSelecaoPorNumero() {
                 spriteBatch.draw(peixeTexture, peixe5X, peixe5Y, 0.6f, 0.6f);
         }
 
-        Texture texturaAtual;
-
-        if (personagemAtual == personagemAgua) {
-            texturaAtual = playerUmTexture;
-        } else if (personagemAtual == personagemFogo) {
-            texturaAtual = playerDoisTexture;
-        } else if (personagemAtual == personagemPesca) {
-            texturaAtual = playerTresTexture;
-        } else if (personagemAtual == personagemConstrucao) {
-            texturaAtual = playerQuatroTexture;
-        } else if (personagemAtual == personagemCura) {
-            texturaAtual = playerCincoTexture;
-        } else {
-            texturaAtual = playerUmTexture;
-        }
-
+        Texture texturaAtual = getTextureDoPersonagem(personagemAtual);
         spriteBatch.draw(texturaAtual, px, py, playerSize, playerSize);
-        
+
         if (personagemAtual != null) {
 
             String texto = personagemAtual.getHabilidade();
@@ -1115,11 +1169,10 @@ private void atualizarSelecaoPorNumero() {
             float textoY = py + playerSize + 0.5f;
 
             gameFont.draw(
-                spriteBatch,
-                texto,
-                textoX,
-                textoY
-            );
+                    spriteBatch,
+                    texto,
+                    textoX,
+                    textoY);
         }
 
         if (carregandoAgua) {
@@ -1177,8 +1230,8 @@ private void atualizarSelecaoPorNumero() {
         cardMenuIniciarTexture.dispose();
         cardSelecaoTexture.dispose();
 
-        for(Texture t : framesAviao) {
-            if(t != null)
+        for (Texture t : framesAviao) {
+            if (t != null)
                 t.dispose();
         }
 

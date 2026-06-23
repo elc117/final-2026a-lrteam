@@ -68,3 +68,5 @@ Personagens: https://farm-animal.itch.io/character-pack
 Fogueira e machado: https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
 
 Abrigo: https://thomaswastaken.itch.io/tileset
+
+Vídeo e asset avião: Gemini Pro
