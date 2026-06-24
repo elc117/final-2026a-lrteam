@@ -47,7 +47,7 @@ O diagrama foi gerado pelo PlantUML.
 
 ## Possíveis Futuras Melhorias:
 
-- Incrementar as mensagens de apoio para o usuário: listas as tarefas na tela ou em um menu, e ir marcando-as quando feitas. Indicar a habilidade do personagem atual selecionado.
+- Incrementar as mensagens de apoio para o usuário: listas as tarefas na tela ou em um menu, e ir marcando-as quando feitas. Indicar a habilidade do personagem atual selecionado. Além disso adicionar colisão com elementos do mapa, como árvores, rio, banco, etc.
 
 - Desenvolver sistema de pontos por tarefa. Por exemplo, se uma pessoa com a habilidade de pesca realiza a tarefa de pescar, ela ganha os 5 pontos (para cada um dos 5 membros do grupo). Por outro lado, se uma pessoa que não tem essa habilidade realiza a tarefa de pesca, ela não ganha os pontos suficientes para todo o grupo, o que não garante a sobrevivência do grupo.
 
@@ -56,11 +56,15 @@ O diagrama foi gerado pelo PlantUML.
 ## Orientações para execução
 
 Rodar o código: ./gradlew lwjgl3:run
+
 Build web: ./gradlew html:dist
 
 ---
 
 ## Resultado Final
+
+![gameplay](anexos/gameplay.gif)
+
 
 O jogador começa na tela de start, podendo sair dela com ENTER. Após, ele deve escolher o seu grupo de 5 possíveis sobreviventes (digita o número e dá ENTER).
 Em seguida, ele cai em uma mapa de floresta, onde precisa realizar 5 tarefas para garantir a sobrevivência do grupo. Além disso, só pode realizar a tarefa o personagem que possui habilidade para tal, ou seja, a seleção dos personagens que o usuário faz é decisiva para a sobrevivência do grupo. A seleção de personagens que garante a sobrevivência é:
