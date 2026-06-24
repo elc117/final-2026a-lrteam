@@ -33,7 +33,8 @@ public class Main implements ApplicationListener {
         INTRODUCAO,
         MENU_INICIAR,
         SELECAO,
-        JOGANDO
+        JOGANDO,
+        FINAL
     }
 
     private EstadoJogo estadoAtual = EstadoJogo.MENU_INICIAR;
@@ -77,6 +78,7 @@ public class Main implements ApplicationListener {
 
     private Texture cardMenuIniciarTexture;
     private Texture cardSelecaoTexture;
+    private Texture telaFinalTexture;
 
     private BitmapFont gameFont;
     private BitmapFont menuFont;
@@ -206,6 +208,7 @@ public class Main implements ApplicationListener {
 
         cardMenuIniciarTexture = new Texture("telaInicio.png");
         cardSelecaoTexture = new Texture("telaSelecao.png");
+        telaFinalTexture = new Texture("telaFinal.png");
         arvoreTexture = new Texture("arvore.png");
         arvoreTroncoTexture = new Texture("arvoreTronco.png");
         madeiraTexture = new Texture("madeira.png");
@@ -320,12 +323,28 @@ public class Main implements ApplicationListener {
                 logic();
                 draw();
                 break;
+
+            case FINAL:
+                renderFinal();
+                break;
         }
     }
 
     private void renderIntroducao() {
 
         ScreenUtils.clear(Color.BLACK);
+
+        //concerta proporção das imagens da tela
+        viewport.apply();
+
+        camera.setToOrtho(
+                false,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
+
+        camera.update();
+
+        spriteBatch.setProjectionMatrix(camera.combined);
 
         tempoIntroducao += Gdx.graphics.getDeltaTime();
 
@@ -363,6 +382,17 @@ public class Main implements ApplicationListener {
     private void renderMenuIniciar() {
 
         ScreenUtils.clear(Color.BLACK);
+
+        viewport.apply();
+
+        camera.setToOrtho(
+                false,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
+
+        camera.update();
+
+        spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
 
@@ -408,6 +438,17 @@ public class Main implements ApplicationListener {
 
         ScreenUtils.clear(Color.BLACK);
 
+        viewport.apply();
+
+        camera.setToOrtho(
+                false,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
+
+        camera.update();
+
+        spriteBatch.setProjectionMatrix(camera.combined);
+
         float screenW = Gdx.graphics.getWidth();
         float screenH = Gdx.graphics.getHeight();
 
@@ -436,6 +477,33 @@ public class Main implements ApplicationListener {
                     slotX,
                     slotY - (i * espacamento));
         }
+
+        spriteBatch.end();
+    }
+
+    private void renderFinal() {
+
+        ScreenUtils.clear(Color.BLACK);
+
+        viewport.apply();
+
+        camera.setToOrtho(
+                false,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
+
+        camera.update();
+
+        spriteBatch.setProjectionMatrix(camera.combined);
+
+        spriteBatch.begin();
+
+        spriteBatch.draw(
+                telaFinalTexture,
+                0,
+                0,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
 
         spriteBatch.end();
     }
@@ -632,6 +700,15 @@ public class Main implements ApplicationListener {
 
         if (mensagemTimer > 0)
             mensagemTimer -= Gdx.graphics.getDeltaTime();
+
+        if (aguaEntregue
+                && fogueiraAcesa
+                && abrigoConstruido
+                && curaCriada
+                && peixesColetados >= 5) {
+
+            estadoAtual = EstadoJogo.FINAL;
+        }
     }
 
     private void interagir() {
@@ -1230,6 +1307,7 @@ public class Main implements ApplicationListener {
         curaTexture.dispose();
         cardMenuIniciarTexture.dispose();
         cardSelecaoTexture.dispose();
+        telaFinalTexture.dispose();
 
         for (Texture t : framesAviao) {
             if (t != null)
