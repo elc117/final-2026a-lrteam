@@ -1,11 +1,13 @@
 package io.github.some_jogo.teste.model;
 
+import io.github.some_jogo.teste.enums.Habilidade;
+
 public class Tarefa {
 
     private String nome;
-    private String habilidadeNecessaria;
+    private Habilidade habilidadeNecessaria;
 
-    public Tarefa(String nome, String habilidadeNecessaria) {
+    public Tarefa(String nome, Habilidade habilidadeNecessaria) {
         this.nome = nome;
         this.habilidadeNecessaria = habilidadeNecessaria;
     }
@@ -14,12 +16,11 @@ public class Tarefa {
         return nome;
     }
 
-    public String getHabilidadeNecessaria() {
+    public Habilidade getHabilidadeNecessaria() {
         return habilidadeNecessaria;
     }
 
     public boolean podeSerRealizadaPor(Personagem personagem) {
-        return personagem.getHabilidade()
-                .equalsIgnoreCase(habilidadeNecessaria);
+        return personagem.getHabilidade() == habilidadeNecessaria;
     }
 }
