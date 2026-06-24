@@ -35,7 +35,16 @@ public class IntroducaoScreen {
         TextureRegion[] regioes = new TextureRegion[100];
 
         for (int i = 1; i <= 100; i++) {
-            String arquivo = String.format("frames-aviao/frame_%03d.png", i);
+            String numeroFormatado;
+            if (i < 10) {
+                numeroFormatado = "00" + i;
+            } else if (i < 100) {
+                numeroFormatado = "0" + i;
+            } else {
+                numeroFormatado = String.valueOf(i);
+            }
+
+            String arquivo = "frames-aviao/frame_" + numeroFormatado + ".png";
             framesAviao[i - 1] = new Texture(arquivo);
             regioes[i - 1] = new TextureRegion(framesAviao[i - 1]);
         }
