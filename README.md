@@ -40,7 +40,7 @@ Tivemos que refatorar o código mais vezes, pois ele acabou ficando mais concent
 
 ## Diagrama de Classes
 
-![diagrama de classes](diagramaClasses.jpg)
+![diagrama de classes](imagem.png)
 O diagrama foi gerado pelo PlantUML.
 
 ---
