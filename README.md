@@ -61,12 +61,12 @@ A Simple Game https://libgdx.com/wiki/start/a-simple-game
 
 Vídeo tutorial https://www.youtube.com/watch?v=aipDYyh1Mlc
 
-Backgrounds e assets usados no tiled: https://danieldiggle.itch.io/sunnyside
-
 Personagens: https://farm-animal.itch.io/character-pack
 
 Fogueira e machado: https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
 
 Abrigo: https://thomaswastaken.itch.io/tileset
 
-Vídeo e asset avião: Gemini Pro
+Logo, vídeo avião e asset avião: Gemini Pro
+
+Tilesets e demais assets usados no tiled: https://danieldiggle.itch.io/sunnyside
