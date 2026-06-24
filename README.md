@@ -30,26 +30,68 @@ Para implementar a coleta dos recursos para as tarefas, criamos a coleta dos rec
 
 Também, adicionamos um segundo personagem e fizemos a distinção dos responsáveis por cada tarefa, restringimos a permissão de cada um para a sua tarefa designada. E incrementamos a tarefa de fazer fogo. Então, as funcionalidades ficaram: tecla E colhe as madeiras, tecla F faz o fogo (no meio do mapa, onde está o tronco), e Tab troca os personagens.
 
----
+Decidimos migrar toda a parte visual para o Tiled, e por lá desenvolvemos os mapas 1 e 2 de forma mais personalizada para as tarefas que criamos, com área específica para coleta de água, coleta de madeira, fazer a fogueira, etc. Junto dos incrementos visuais fomos adionando as outras tarefas: pescar, produzir cura e construir o abrigo. Basicamente as ações de coletar/pegar são com a tecla E, e as ações de colocar, criar, construir são com a tecla C. Adicionamos de forma melhorada a lógica para a seleção do grupo de sobreviventes, onde o usuário escolhe 5 de 10 personagens.
 
-## Entrega parcial
+Decidimos adicionar também uma cutscene de uma avião no início, de forma a ambientar o usuário sobre a temática do jogo. Ela foi implementada usando frames do vídeo original. Usamos IA para auxiliar nessa etapa, tanto para criação do vídeo como para a implementação. Além disso, criamos tela inicial, de seleção e tela final. 
 
-Funcionalidades do jogo:
-
-* personagem com movimentação livre
-* dois mapas (floresta e rio)
-* árvore com coleta de madeira
-* rio com coleta de água
-* tronco com criação de fogo
-* sistema simples de interações por teclas E, F e Tab
+Tivemos que refatorar o código mais vezes, pois ele acabou ficando mais concentrado na main durante o desenvolvimento. A IA ajudou a corrigir bugs acarretados pela refatoração. Tentamos implementar mensagens pela tela, que serviriam de guia para o jogador, mas ocorreram muitos bugs, em relação à visualização da fonte, ora ficava enorme, ora desaparecia da tela, além de letras de uma mesma palavra saírem sobrepostas.
 
 ---
 
-## Próximos passos:
+## Diagrama de Classes
 
-- Como inicialmente focamos na lógica do programa, precisamos melhorar o visual, adicionar tela de start, mostrar personagens na tela, mensagens de apoio, etc.
+![diagrama de classes](diagramaClasses.jpg)
+O diagrama foi gerado pelo PlantUML.
+
+---
+
+## Possíveis Futuras Melhorias:
+
+- Incrementar as mensagens de apoio para o usuário: listas as tarefas na tela ou em um menu, e ir marcando-as quando feitas. Indicar a habilidade do personagem atual selecionado.
 
 - Desenvolver sistema de pontos por tarefa. Por exemplo, se uma pessoa com a habilidade de pesca realiza a tarefa de pescar, ela ganha os 5 pontos (para cada um dos 5 membros do grupo). Por outro lado, se uma pessoa que não tem essa habilidade realiza a tarefa de pesca, ela não ganha os pontos suficientes para todo o grupo, o que não garante a sobrevivência do grupo.
+
+---
+
+## Orientações para execução
+
+Rodar o código: ./gradlew lwjgl3:run
+Build web: ./gradlew html:dist
+
+---
+
+## Resultado Final
+
+O jogador começa na tela de start, podendo sair dela com ENTER. Após, ele deve escolher o seu grupo de 5 possíveis sobreviventes (digita o número e dá ENTER).
+Em seguida, ele cai em uma mapa de floresta, onde precisa realizar 5 tarefas para garantir a sobrevivência do grupo. Além disso, só pode realizar a tarefa o personagem que possui habilidade para tal, ou seja, a seleção dos personagens que o usuário faz é decisiva para a sobrevivência do grupo. A seleção de personagens que garante a sobrevivência é:
+1. João - Pesca
+2. Ana - Cura
+3. Pedro - Fogo
+4. Leo - Construção
+5. Felipe - Água
+
+As tarefas a serem realizadas são:
+1. Construir abrigo: 
+   - No mapa 1, vá até a área desmatada e colete madeira com a tecla E.
+   - Aproxime-se da área de terra na parte superior do mapa, e use a tecla C para construir o abrigo. 
+   - (É ideal que essa tarefa seja realizada antes da Coleta de água, pois há dependência com o abrigo)
+
+2. Acender fogueira:
+   - Vá até a área desmatada e colete madeira com a tecla E.
+   - Vá até a área central do mapa 1 (onde há um banco e uma marcação no chão) e acenda o fogo com a tecla F.
+
+3. Pescar:
+   - Vá até o mapa 2, indo para baixo no mapa 1, e posicione-se sobre o deque próximo ao rio. Usar tecla E para pescar (O anzol é o ponto de pesca).
+
+4. Produzir cura:
+   - No mapa 2, vá até a área dos arbustos frutíferos, e colha frutos dos 5 arbustos com a tecla E.
+   - Após a coleta, aproxime-se do cesto cheio de frutas e produza a cura com a tecla C.
+
+5. Coletar água:
+   - Vá até o balde próximo ao rio no mapa 2 e colete água com a tecla E.
+   - Leve a água até o abrigo no mapa 1, e coloque-a sobre a mesa com a tecla C.
+
+Ao realizar todas as tarefas, o jogador garante a sobrevivência do grupo!
 
 ---
 
