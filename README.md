@@ -99,7 +99,7 @@ Ao realizar todas as tarefas, o jogador garante a sobrevivência do grupo!
 
 ---
 
-Link itch.io: https://renatalauren.itch.io/gamesurvivors
+[Link itch.io](https://renatalauren.itch.io/survivors)
 
 ## Referências
 
