@@ -36,7 +36,7 @@ public class Main implements ApplicationListener {
         JOGANDO
     }
 
-    private EstadoJogo estadoAtual = EstadoJogo.INTRODUCAO;
+    private EstadoJogo estadoAtual = EstadoJogo.MENU_INICIAR;
 
     Texture arvoreTexture, arvoreTroncoTexture;
     Texture baldeVazioTexture, baldeCheioTexture, madeiraTexture;
@@ -202,10 +202,10 @@ public class Main implements ApplicationListener {
         gameFont.getData().setScale(0.02f);
 
         menuFont = new BitmapFont();
-        menuFont.getData().setScale(0.90f);
+        menuFont.getData().setScale(2f);
 
-        cardMenuIniciarTexture = new Texture("card_menuiniciar.png");
-        cardSelecaoTexture = new Texture("card_selecao.png");
+        cardMenuIniciarTexture = new Texture("telaInicio.png");
+        cardSelecaoTexture = new Texture("telaSelecao.png");
         arvoreTexture = new Texture("arvore.png");
         arvoreTroncoTexture = new Texture("arvoreTronco.png");
         madeiraTexture = new Texture("madeira.png");
@@ -276,13 +276,13 @@ public class Main implements ApplicationListener {
 
         sobreviventesSelecionados = new ArrayList<>();
 
-        framesAviao = new Texture[51];
-        TextureRegion[] regioes = new TextureRegion[51];
+        framesAviao = new Texture[100];
+        TextureRegion[] regioes = new TextureRegion[100];
 
-        for (int i = 1; i <= 51; i++) {
+        for (int i = 1; i <= 100; i++) {
 
             String arquivo = String.format(
-                    "frames-aviao/ezgif-frame-%03d.png", i);
+                    "frames-aviao/frame_%03d.png", i);
 
             framesAviao[i - 1] = new Texture(arquivo);
             regioes[i - 1] = new TextureRegion(framesAviao[i - 1]);
@@ -352,11 +352,11 @@ public class Main implements ApplicationListener {
         spriteBatch.end();
 
         if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
-            estadoAtual = EstadoJogo.MENU_INICIAR;
+            estadoAtual = EstadoJogo.JOGANDO;
         }
 
         if (animacaoAviao.isAnimationFinished(tempoIntroducao)) {
-            estadoAtual = EstadoJogo.MENU_INICIAR;
+            estadoAtual = EstadoJogo.JOGANDO;
         }
     }
 
@@ -423,7 +423,7 @@ public class Main implements ApplicationListener {
         menuFont.setColor(Color.GOLD);
 
         // Área da direita
-        float slotX = screenW * 0.63f;
+        float slotX = screenW * 0.83f;
         float slotY = screenH * 0.63f;
         float espacamento = screenH * 0.08f;
 
@@ -542,7 +542,8 @@ public class Main implements ApplicationListener {
         }
         personagemAtual = sobreviventesSelecionados.get(0);
 
-        estadoAtual = EstadoJogo.JOGANDO;
+        tempoIntroducao = 0f;
+        estadoAtual = EstadoJogo.INTRODUCAO;
     }
 
     private void input() {
