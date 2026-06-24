@@ -63,7 +63,7 @@ Build web: ./gradlew html:dist
 
 ## Resultado Final
 
-![gameplay](anexos/gameplay.gif)
+![gameplay](anexos/gameplay.mp4)
 
 
 O jogador começa na tela de start, podendo sair dela com ENTER. Após, ele deve escolher o seu grupo de 5 possíveis sobreviventes (digita o número e dá ENTER).
